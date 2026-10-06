@@ -80,6 +80,23 @@ select:focus-visible {
   box-shadow: 0 12px 30px rgba(18, 52, 91, 0.045), inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
+html:not(.dark) .technical-page [class*="bg-[#07111F]"],
+html:not(.dark) .technical-page [class*="bg-[#0B1726]"] {
+  background-color: #ffffff !important;
+}
+
+html:not(.dark) .technical-page [class*="bg-[#10283A]"] {
+  background-color: #e8f7fb !important;
+}
+
+html:not(.dark) .technical-page [class*="text-white"] {
+  color: #172033 !important;
+}
+
+html:not(.dark) .technical-page [class*="border-white"] {
+  border-color: #d9e2ec !important;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .dashboard-reveal {
     animation: dashboard-reveal 650ms cubic-bezier(0.32, 0.72, 0, 1) both;

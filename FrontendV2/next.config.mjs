@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const isExport = process.env.NEXT_EXPORT === 'true'
+const apiDestination = process.env.BIOQSHIELD_API_URL || 'http://127.0.0.1:8001'
 
 const nextConfig = {
   typescript: {
@@ -14,7 +15,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://127.0.0.1:8000/api/:path*',
+        destination: `${apiDestination}/api/:path*`,
       },
     ]
   },
