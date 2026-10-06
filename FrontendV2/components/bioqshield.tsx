@@ -47,7 +47,6 @@ import { getAuthUser, setAuthUser, getLatestTransfer, getTransferHistory, logout
 
 const navItems = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { label: 'Quantum Console', href: '/quantum-console/', icon: Cpu },
   { label: 'Secure Transfer', href: '/secure-transfer/', icon: Send },
   { label: 'Security Dashboard', href: '/security-dashboard/', icon: ShieldCheck },
   { label: 'Scenario Comparison', href: '/scenario-comparison/', icon: BarChart3 },
