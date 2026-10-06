@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from quantum import postprocess as pp
+from . import anomaly
 
 
 class Action(str, Enum):
@@ -64,7 +65,7 @@ class PolicyConfig:
 
 @dataclass
 class LinkBaseline:
-    """A link's ordinary QBER, learned from sessions that were accepted.
+    """A link's ordinary QBER and telemetry, learned from sessions that were accepted.
 
     Exponentially forgotten counts (error bits / sampled bits). The variance of the
     baseline is kept so that a baseline learned from little data is not over-trusted.
@@ -73,6 +74,8 @@ class LinkBaseline:
     decay: float = 0.98
     errors: float = 0.0
     bits: float = 0.0
+    sift_count: float = 0.0
+    total_qubits: float = 0.0
 
     @property
     def ready(self) -> bool:
@@ -82,9 +85,29 @@ class LinkBaseline:
     def qber(self) -> float:
         return self.errors / self.bits if self.bits else 0.0
 
-    def update(self, qber: float, sample_size: int) -> None:
+    @property
+    def qber_std(self) -> float:
+        if not self.ready or self.bits <= 0:
+            return 0.0
+        p = self.qber
+        return math.sqrt(p * (1 - p) / self.bits)
+
+    @property
+    def sift_rate(self) -> float:
+        return self.sift_count / self.total_qubits if self.total_qubits else 0.0
+
+    @property
+    def sift_rate_std(self) -> float:
+        if not self.ready or self.total_qubits <= 0:
+            return 0.0
+        p = self.sift_rate
+        return math.sqrt(p * (1 - p) / self.total_qubits)
+
+    def update(self, qber: float, sample_size: int, sifted: int, total_qubits: int) -> None:
         self.errors = self.errors * self.decay + qber * sample_size
         self.bits = self.bits * self.decay + sample_size
+        self.sift_count = self.sift_count * self.decay + sifted
+        self.total_qubits = self.total_qubits * self.decay + total_qubits
 
     def z_score(self, qber: float, sample_size: int) -> float:
         """How many standard deviations `qber` sits above the baseline (binomial model)."""
@@ -93,6 +116,18 @@ class LinkBaseline:
         b = min(max(self.qber, 0.002), 0.5)
         sigma = math.sqrt(b * (1 - b) * (1 / sample_size + 1 / self.bits))
         return (qber - b) / sigma
+
+    def z_score_sift_rate(self, sifted: int, total_qubits: int) -> float:
+        """How many standard deviations `sifted/total_qubits` sits above the baseline (binomial model)."""
+        if not self.ready or total_qubits <= 0:
+            return 0.0
+        p = self.sift_rate
+        # Binomial standard deviation for the difference between current session and baseline
+        sigma = math.sqrt(p * (1 - p) * (1 / total_qubits + 1 / self.total_qubits))
+        if sigma == 0:
+            return 0.0
+        current_rate = sifted / total_qubits if total_qubits > 0 else 0.0
+        return (current_rate - p) / sigma
 
 
 @dataclass
@@ -122,7 +157,7 @@ class LinkController:
     def calibrate(self, reports) -> None:
         """Seed the baseline from sessions known to be clean (commissioning the link)."""
         for r in reports:
-            self.baseline.update(r.qber, r.sample_size)
+            self.baseline.update(r.qber, r.sample_size, r.n_sifted, r.n_qubits)
 
     def decide(self, report, threat: float | None = None) -> Decision:
         if self.mode not in ("static", "adaptive"):
@@ -131,6 +166,9 @@ class LinkController:
         adaptive = self.mode == "adaptive"
         t = threat if (adaptive and threat is not None) else None
         q, m = report.qber, report.sample_size
+        # Use the original n_sifted and n_qubits fields for the current session
+        sifted = report.n_sifted
+        total_qubits = report.n_qubits
         reasons: list[str] = []
 
         # ---- effective limits ------------------------------------------------------
@@ -155,7 +193,11 @@ class LinkController:
             action = Action.REJECT
             reasons.append(f"QBER {q:.1%} above the {reject_limit:.0%} limit: no secret key can be trusted")
         else:
-            if q > accept_limit:
+            # PNS violation check - must be able to override Accept
+            if getattr(report, 'pns_violation', False):
+                action = Action.REJECT
+                reasons.append("Photon-number-splitting attack detected via decoy-state method")
+            elif q > accept_limit:
                 if threat_high:
                     action = Action.REJECT
                     reasons.append(
@@ -183,6 +225,43 @@ class LinkController:
                 action = Action.MONITOR
                 reasons.append(f"QBER is clean but network threat is high ({t:.2f}): classical side may be under attack")
 
+        # ---- Temporal anomaly detection -------------------------------------------------
+        # Use the baseline from previous sessions to detect anomalies in the current session
+        from . import anomaly
+        # Initialize anomaly flag
+        temporal_anomaly = False
+        anomaly_reasons = []
+
+        # Check QBER CUSUM if trace is available (only when LinkReport comes from run_link_session)
+        if report.qber_trace is not None and len(report.qber_trace) > 0:
+            qber_cusum_anomaly, qber_cusum_score = anomaly.cusum_qber(report.qber_trace)
+            if qber_cusum_anomaly:
+                temporal_anomaly = True
+                anomaly_reasons.append("QBER CUSUM detected persistent increase")
+
+        # Check sift rate Z-score - calculate from n_sifted/n_qubits to handle both run_link_session
+        # and directly constructed LinkReport objects (as in tests)
+        if report.n_qubits > 0:
+            sift_rate = report.n_sifted / report.n_qubits
+            # We need to create a temporary LinkReport-like object to pass to zscore_sift_rate
+            # or calculate the z-score directly. Let's calculate it directly for simplicity.
+            # The z_score_sift_rate function expects: current_rate, baseline_rate, baseline_std
+            baseline_rate = self.baseline.sift_rate
+            baseline_std = self.baseline.sift_rate_std
+            if baseline_std > 0:
+                z_score = abs(sift_rate - baseline_rate) / baseline_std
+                # Detect if z-score exceeds 10 (to avoid false positives in early sessions)
+                if z_score > 10.0:
+                    temporal_anomaly = True
+                    anomaly_reasons.append(f"Sift rate z-score {z_score:.2f} exceeds threshold")
+
+        # If temporal anomaly detected and current action is ACCEPT, then escalate to MONITOR
+        if temporal_anomaly and action == Action.ACCEPT:
+            action = Action.MONITOR
+            reasons.append("Temporal anomaly detected in session telemetry")
+        # Add any anomaly reasons to the reasons list
+        reasons.extend(anomaly_reasons)
+
         if action is Action.ACCEPT:
             reasons.append(f"QBER {q:.1%} within {accept_limit:.1%}, key {report.key_bits} bits")
             if threat_elev:
@@ -197,6 +276,6 @@ class LinkController:
         else:
             self.consecutive_monitor = 0
         if adaptive and action is Action.ACCEPT and not threat_elev:
-            self.baseline.update(q, m)  # only clean, accepted sessions teach the baseline
+            self.baseline.update(q, m, sifted, total_qubits)  # only clean, accepted sessions teach the baseline
 
         return Decision(action, reasons, self.mode, q, t, accept_limit, reject_limit, z)  # t: the threat actually used

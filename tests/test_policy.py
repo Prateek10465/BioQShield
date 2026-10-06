@@ -15,7 +15,8 @@ def rep(qber, key_bits=800, m=1000, upper=None):
 def ready_baseline(q=0.02):
     b = LinkBaseline()
     for _ in range(10):
-        b.update(q, 1000)
+        # Assuming 50% sift rate for simplicity in tests
+        b.update(q, 1000, 500, 1000)
     return b
 
 

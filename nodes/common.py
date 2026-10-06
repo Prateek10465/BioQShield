@@ -155,17 +155,34 @@ def canonical(body: dict) -> bytes:
 
 
 def seal(kid: str, key: bytes, sid: str, seq: int, kind: str, payload: dict) -> dict:
-    body = {"kid": kid, "sid": sid, "seq": seq, "kind": kind, "ts": int(time.time()), "payload": payload}
-    return {**body, "mac": hmac.new(key, canonical(body), hashlib.sha256).hexdigest()}
+    # Choose authentication mode based on environment variable
+    auth_mode = os.environ.get("QKD_AUTH_MODE", "hmac").lower()
+    if auth_mode in ("wegman-carter", "wc"):
+        # Use Wegman-Carter authentication
+        from . import wegman_auth
+        body = {"kid": kid, "sid": sid, "seq": seq, "kind": kind, "ts": int(time.time()), "payload": payload}
+        return wegman_auth.seal_wc_bytes(key, body)
+    else:
+        # Default to HMAC-SHA256
+        body = {"kid": kid, "sid": sid, "seq": seq, "kind": kind, "ts": int(time.time()), "payload": payload}
+        return {**body, "mac": hmac.new(key, canonical(body), hashlib.sha256).hexdigest()}
 
 
 def mac_ok(envelope: dict, key: bytes) -> bool:
-    try:
-        body = {f: envelope[f] for f in FIELDS}
-        expected = hmac.new(key, canonical(body), hashlib.sha256).hexdigest()
-        return hmac.compare_digest(str(envelope["mac"]), expected)
-    except (KeyError, TypeError):
-        return False
+    # Choose authentication mode based on environment variable
+    auth_mode = os.environ.get("QKD_AUTH_MODE", "hmac").lower()
+    if auth_mode in ("wegman-carter", "wc"):
+        # Use Wegman-Carter authentication
+        from . import wegman_auth
+        return wegman_auth.verify_wc_bytes(envelope, key)
+    else:
+        # Default to HMAC-SHA256
+        try:
+            body = {f: envelope[f] for f in FIELDS}
+            expected = hmac.new(key, canonical(body), hashlib.sha256).hexdigest()
+            return hmac.compare_digest(str(envelope["mac"]), expected)
+        except (KeyError, TypeError):
+            return False
 
 
 @dataclass

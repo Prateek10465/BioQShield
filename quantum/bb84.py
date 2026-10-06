@@ -36,6 +36,9 @@ class Transmission:
     bob_bits: np.ndarray
     intercepted: np.ndarray  # bool: Eve measured this qubit
     eve_knows: np.ndarray  # bool: Eve's basis matched Alice's, so she learned the bit
+    # Decoy-state extensions
+    intensities: np.ndarray | None  # intensity mu for each pulse
+    photon_numbers: np.ndarray | None  # photon number for each pulse
 
 
 @dataclass
@@ -44,6 +47,9 @@ class Sifted:
     alice: np.ndarray
     bob: np.ndarray
     eve_knows: np.ndarray
+    # Decoy-state extensions
+    intensities: np.ndarray | None  # intensity for each sifted bit
+    photon_numbers: np.ndarray | None  # photon number for each sifted bit
 
 
 @dataclass
@@ -56,6 +62,9 @@ class Estimation:
     bob_key: np.ndarray
     eve_knows: np.ndarray
     positions: np.ndarray
+    # Decoy-state extensions
+    intensities: np.ndarray | None  # intensity for each bit in the sample (or key?)
+    photon_numbers: np.ndarray | None  # photon number for each bit
 
 
 def qber_upper_bound(q: float, m: int, sigmas: float = 4.0) -> float:
@@ -73,12 +82,14 @@ def transmit(
     noise: float = 0.02,
     eve_rate: float = 0.0,
     eve_start: float = 0.0,
+    intensities: np.ndarray | None = None,
     rng: np.random.Generator | None = None,
 ) -> Transmission:
     """Send `n` qubits from Alice to Bob.
 
     eve_rate:  fraction of qubits Eve intercepts (0 = no Eve, 1 = full attack).
     eve_start: Eve only attacks qubits after this fraction of the stream (0..1).
+    intensities: per-pulse intensity μ (mean photon number). If None, use coherent state with μ=0.5 for all pulses.
     """
     rng = rng or np.random.default_rng()
     a_bits = rng.integers(0, 2, n, dtype=np.uint8)
@@ -100,7 +111,13 @@ def transmit(
     b_bits = np.where(same, state_bits, rng.integers(0, 2, n, dtype=np.uint8)).astype(np.uint8)
     b_bits ^= (rng.random(n) < noise).astype(np.uint8)  # channel / detector noise
 
-    return Transmission(n, a_bits, a_bases, b_bases, b_bits, intercepted, eve_knows)
+    # Decoy-state extensions
+    if intensities is None:
+        intensities = np.full(n, 0.5, dtype=np.float64)
+    photon_numbers = rng.poisson(intensities)
+
+    return Transmission(n, a_bits, a_bases, b_bases, b_bits, intercepted, eve_knows,
+                        intensities, photon_numbers)
 
 
 def sift(tx: Transmission) -> Sifted:
@@ -111,6 +128,8 @@ def sift(tx: Transmission) -> Sifted:
         alice=tx.alice_bits[keep],
         bob=tx.bob_bits[keep],
         eve_knows=tx.eve_knows[keep],
+        intensities=tx.intensities[keep] if tx.intensities is not None else None,
+        photon_numbers=tx.photon_numbers[keep] if tx.photon_numbers is not None else None,
     )
 
 
@@ -132,6 +151,12 @@ def estimate_qber(
     q = float(errors.mean())
     q_upper = qber_upper_bound(q, m)
 
+    # For the sample and key arrays, we also need to carry intensities and photon_numbers if present.
+    sample_intensities = s.intensities[pick] if s.intensities is not None else None
+    sample_photon_numbers = s.photon_numbers[pick] if s.photon_numbers is not None else None
+    key_intensities = s.intensities[~pick] if s.intensities is not None else None
+    key_photon_numbers = s.photon_numbers[~pick] if s.photon_numbers is not None else None
+
     return Estimation(
         sample_positions=s.positions[pick],
         sample_errors=errors,
@@ -141,6 +166,8 @@ def estimate_qber(
         bob_key=s.bob[~pick],
         eve_knows=s.eve_knows[~pick],
         positions=s.positions[~pick],
+        intensities=key_intensities,
+        photon_numbers=key_photon_numbers,
     )
 
 

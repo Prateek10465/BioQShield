@@ -107,4 +107,6 @@ def transmit_qiskit(
         bob_bits=b_bits,
         intercepted=intercepted,
         eve_knows=intercepted & (e_bases == a_bases),  # same basis: she read the bit exactly
+        intensities=None,
+        photon_numbers=None,
     )
