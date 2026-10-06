@@ -280,6 +280,11 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
     def link(user: User = Depends(current_user)) -> dict:
         return link_probe()
 
+    @app.get("/api/link-state")
+    def link_state() -> dict:
+        """Expose simulator conditions to the unauthenticated V2 security workflow."""
+        return link_probe()
+
     # ---- quantum simulation & threat endpoints ----------------------------------------
     @app.post("/api/run")
     def run_sim(req: RunRequest) -> dict:

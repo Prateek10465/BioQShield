@@ -32,6 +32,7 @@ import {
   RunParams,
   RunResponse,
   runSimulation,
+  fetchLinkState,
   saveTransferToHistory,
   TransferHistoryItem,
 } from '@/lib/api'
@@ -41,19 +42,19 @@ type Verdict = 'ACCEPT' | 'MONITOR' | 'REJECT'
 function tone(verdict: Verdict) {
   return verdict === 'ACCEPT'
     ? {
-        bg: 'bg-[#E8F7EF] dark:bg-[#22C55E]/15',
-        border: 'border-[#B9E5D0] dark:border-[#22C55E]/30',
-        text: 'text-[#198657] dark:text-[#7BE3A0]',
-        strong: '#22A06B',
-      }
+      bg: 'bg-[#E8F7EF] dark:bg-[#22C55E]/15',
+      border: 'border-[#B9E5D0] dark:border-[#22C55E]/30',
+      text: 'text-[#198657] dark:text-[#7BE3A0]',
+      strong: '#22A06B',
+    }
     : verdict === 'MONITOR'
-    ? {
+      ? {
         bg: 'bg-[#FFF5E7] dark:bg-[#F59E0B]/15',
         border: 'border-[#F2D29F] dark:border-[#F59E0B]/30',
         text: 'text-[#B76405] dark:text-[#FFD083]',
         strong: '#D97706',
       }
-    : {
+      : {
         bg: 'bg-[#FDEBEC] dark:bg-[#EF4444]/15',
         border: 'border-[#F2BFC2] dark:border-[#EF4444]/30',
         text: 'text-[#C33E42] dark:text-[#FF9292]',
@@ -98,11 +99,10 @@ export function SecurityPipeline({ stages, verdict }: { stages: RunResponse['sta
           </h2>
         </div>
         <span
-          className={`rounded-full px-3 py-1.5 text-[10px] font-semibold ${
-            verdict === 'ACCEPT'
+          className={`rounded-full px-3 py-1.5 text-[10px] font-semibold ${verdict === 'ACCEPT'
               ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
               : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
-          }`}
+            }`}
         >
           {verdict === 'ACCEPT' ? 'Delivery Approved' : 'Transfer Held'}
         </span>
@@ -115,22 +115,20 @@ export function SecurityPipeline({ stages, verdict }: { stages: RunResponse['sta
           return (
             <div key={st.id} className="relative">
               <div
-                className={`flex min-h-[116px] flex-col items-center rounded-xl border p-3 text-center transition ${
-                  isAbort
+                className={`flex min-h-[116px] flex-col items-center rounded-xl border p-3 text-center transition ${isAbort
                     ? 'border-[#F2D9DA] dark:border-[#DC4446]/30 bg-[#FFF9F9] dark:bg-[#DC4446]/10'
                     : isOk
-                    ? 'border-[#B9E5D0] dark:border-[#22C55E]/30 bg-[#F6FCF8] dark:bg-[#22C55E]/10'
-                    : 'border-[#D9E2EC] dark:border-white/10 bg-[#F8FBFD] dark:bg-white/[0.02]'
-                }`}
+                      ? 'border-[#B9E5D0] dark:border-[#22C55E]/30 bg-[#F6FCF8] dark:bg-[#22C55E]/10'
+                      : 'border-[#D9E2EC] dark:border-white/10 bg-[#F8FBFD] dark:bg-white/[0.02]'
+                  }`}
               >
                 <div
-                  className={`flex size-8 items-center justify-center rounded-full ${
-                    isAbort
+                  className={`flex size-8 items-center justify-center rounded-full ${isAbort
                       ? 'bg-[#FDEBEC] text-[#DC4446]'
                       : isOk
-                      ? 'bg-[#E8F7EF] text-[#22A06B]'
-                      : 'bg-[#EEF3F8] dark:bg-white/10 text-[#8A9AAD]'
-                  }`}
+                        ? 'bg-[#E8F7EF] text-[#22A06B]'
+                        : 'bg-[#EEF3F8] dark:bg-white/10 text-[#8A9AAD]'
+                    }`}
                 >
                   {isAbort ? (
                     <X className="size-4" />
@@ -181,9 +179,8 @@ export function ThreatScoreCard({ threat }: { threat: RunResponse['threat'] }) {
         </div>
         <div className="text-right">
           <div
-            className={`text-[12px] font-bold ${
-              isAttack ? 'text-[#DC4446] dark:text-[#FF9292]' : 'text-[#198657] dark:text-[#7BE3A0]'
-            }`}
+            className={`text-[12px] font-bold ${isAttack ? 'text-[#DC4446] dark:text-[#FF9292]' : 'text-[#198657] dark:text-[#7BE3A0]'
+              }`}
           >
             {threat.classification.toUpperCase()}
           </div>
@@ -195,13 +192,12 @@ export function ThreatScoreCard({ threat }: { threat: RunResponse['threat'] }) {
       <div className="mt-5">
         <div className="h-2 overflow-hidden rounded-full bg-[#E8EEF3] dark:bg-white/10">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              threat.score >= 0.8
+            className={`h-full rounded-full transition-all duration-500 ${threat.score >= 0.8
                 ? 'bg-[#DC4446]'
                 : threat.score >= 0.5
-                ? 'bg-[#D97706]'
-                : 'bg-[#22A06B]'
-            }`}
+                  ? 'bg-[#D97706]'
+                  : 'bg-[#22A06B]'
+              }`}
             style={{ width: `${Math.min(threat.score * 100, 100)}%` }}
           />
         </div>
@@ -238,9 +234,8 @@ export function QuantumChannelCard({ response }: { response: RunResponse }) {
 
         <div className="relative flex flex-1 items-center justify-center">
           <div
-            className={`h-px w-full border-t border-dashed ${
-              eveActive ? 'border-[#DC4446]' : 'border-[#06B6D4]'
-            }`}
+            className={`h-px w-full border-t border-dashed ${eveActive ? 'border-[#DC4446]' : 'border-[#06B6D4]'
+              }`}
           />
           {eveActive ? (
             <div className="absolute flex flex-col items-center">
@@ -264,11 +259,10 @@ export function QuantumChannelCard({ response }: { response: RunResponse }) {
       </div>
 
       <div
-        className={`mt-5 flex items-center gap-2 rounded-lg px-3 py-2.5 text-[10px] font-semibold ${
-          eveActive
+        className={`mt-5 flex items-center gap-2 rounded-lg px-3 py-2.5 text-[10px] font-semibold ${eveActive
             ? 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
             : 'bg-[#EAF8F5] dark:bg-[#14B8A6]/15 text-[#128F7C] dark:text-[#67E8D9]'
-        }`}
+          }`}
       >
         {eveActive ? (
           <>
@@ -304,9 +298,8 @@ export function QBERCard({ response }: { response: RunResponse }) {
       <div className="mt-5">
         <div className="relative h-3 overflow-hidden rounded-full bg-[#E8EEF3] dark:bg-white/10">
           <div
-            className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
-              isHigh ? 'bg-[#DC4446]' : response.stats.qber_est >= 0.06 ? 'bg-[#D97706]' : 'bg-[#22A06B]'
-            }`}
+            className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${isHigh ? 'bg-[#DC4446]' : response.stats.qber_est >= 0.06 ? 'bg-[#D97706]' : 'bg-[#22A06B]'
+              }`}
             style={{ width: `${Math.min((response.stats.qber_est / 0.11) * 60, 100)}%` }}
           />
           <div className="absolute inset-y-[-4px] left-[60%] w-0.5 bg-[#C33E42]" title="11% abort threshold" />
@@ -351,13 +344,12 @@ export function PolicyComparisonCard({ response }: { response: RunResponse }) {
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#9AAABD]">Static Policy</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
-                stat.verdict === 'ACCEPT'
+              className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${stat.verdict === 'ACCEPT'
                   ? 'bg-[#E8F7EF] text-[#198657]'
                   : stat.verdict === 'MONITOR'
-                  ? 'bg-[#FFF5E7] text-[#B76405]'
-                  : 'bg-[#FDEBEC] text-[#C33E42]'
-              }`}
+                    ? 'bg-[#FFF5E7] text-[#B76405]'
+                    : 'bg-[#FDEBEC] text-[#C33E42]'
+                }`}
             >
               {stat.verdict}
             </span>
@@ -374,13 +366,12 @@ export function PolicyComparisonCard({ response }: { response: RunResponse }) {
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold text-[#2563EB] dark:text-[#67E8F9]">Adaptive Policy</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
-                adap.verdict === 'ACCEPT'
+              className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${adap.verdict === 'ACCEPT'
                   ? 'bg-[#E8F7EF] text-[#198657]'
                   : adap.verdict === 'MONITOR'
-                  ? 'bg-[#FFF5E7] text-[#B76405]'
-                  : 'bg-[#FDEBEC] text-[#C33E42]'
-              }`}
+                    ? 'bg-[#FFF5E7] text-[#B76405]'
+                    : 'bg-[#FDEBEC] text-[#C33E42]'
+                }`}
             >
               {adap.verdict}
             </span>
@@ -427,11 +418,10 @@ export function ProtectedRecordSection({
           </h2>
         </div>
         <span
-          className={`rounded-full px-3 py-1 text-[10px] font-bold ${
-            accepted
+          className={`rounded-full px-3 py-1 text-[10px] font-bold ${accepted
               ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
               : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
-          }`}
+            }`}
         >
           {accepted ? 'RECORD DELIVERED' : 'RECORD BLOCKED'}
         </span>
@@ -525,7 +515,9 @@ export function SecurityAnalysisExperience() {
     setLoading(true)
     setError(null)
     try {
-      const res = await runSimulation(params)
+      const linkState = await fetchLinkState()
+      const effectiveParams = linkState?.eve ? { ...params, eve: true } : params
+      const res = await runSimulation(effectiveParams)
       setResponse(res)
 
       // Save to local transfer history
@@ -573,7 +565,7 @@ export function SecurityAnalysisExperience() {
           const parsed = JSON.parse(stored)
           setTransferContext(parsed)
           if (parsed.params) p = parsed.params
-        } catch {}
+        } catch { }
       }
     }
     executeAnalysis(p)
@@ -663,11 +655,10 @@ export function SecurityAnalysisExperience() {
           </p>
         </div>
         <div
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold ${
-            verdict === 'ACCEPT'
+          className={`flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold ${verdict === 'ACCEPT'
               ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
               : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
-          }`}
+            }`}
         >
           {verdict === 'ACCEPT' ? <CheckCircle2 className="size-4" /> : <XCircle className="size-4" />}
           VERDICT: {verdict}

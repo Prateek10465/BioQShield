@@ -261,6 +261,26 @@ export async function fetchQiskitDemo(params: {
   return res.json()
 }
 
+export interface LinkState {
+  reachable: boolean
+  source: string
+  eve?: boolean
+  eve_rate?: number
+  eve_start?: number
+  noise?: number
+  tamper?: boolean
+}
+
+export async function fetchLinkState(): Promise<LinkState | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/link-state`, { cache: 'no-store' })
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
+  }
+}
+
 // Initial seed history for demo
 const INITIAL_HISTORY: TransferHistoryItem[] = [
   {
@@ -385,7 +405,7 @@ export function getAuthUser(): AuthUser {
   try {
     const stored = localStorage.getItem('bioqshield_user')
     if (stored) return JSON.parse(stored)
-  } catch {}
+  } catch { }
   return DEFAULT_USER
 }
 
