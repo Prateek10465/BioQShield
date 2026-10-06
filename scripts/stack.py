@@ -30,6 +30,29 @@ def free_port() -> int:
         return s.getsockname()[1]
 
 
+def free_stale_port(port: int) -> None:
+    """If an orphaned local process is holding this port, terminate it."""
+    try:
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", port))
+            return
+    except OSError:
+        pass
+    if sys.platform == "win32":
+        try:
+            out = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command",
+                 f"Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess"],
+                text=True, timeout=5
+            )
+            for line in out.strip().splitlines():
+                pid = line.strip()
+                if pid and pid.isdigit() and int(pid) != os.getpid():
+                    subprocess.run(["taskkill", "/F", "/PID", pid], capture_output=True)
+        except Exception:
+            pass
+
+
 class Stack:
     def __init__(self, data_dir: Path, *, etsi: bool = False, ports: dict | None = None, env: dict | None = None,
                  fresh: bool = False):
@@ -37,10 +60,23 @@ class Stack:
         self.etsi = etsi
         p = ports or {}
         self.ports = {k: p.get(k) or free_port() for k in ("alice", "bob", "link", "kme")}
+        if ports:
+            for port in self.ports.values():
+                free_stale_port(port)
         self.extra_env = env or {}
         self.procs: dict[str, subprocess.Popen] = {}
         if fresh and self.data_dir.exists():
-            shutil.rmtree(self.data_dir)
+            def _on_rm_error(func, path, exc_info):
+                import stat
+                try:
+                    os.chmod(path, stat.S_IWRITE)
+                    func(path)
+                except Exception:
+                    pass
+            try:
+                shutil.rmtree(self.data_dir, onexc=_on_rm_error)
+            except Exception:
+                shutil.rmtree(self.data_dir, ignore_errors=True)
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
     # ---- addresses --------------------------------------------------------
@@ -127,10 +163,13 @@ class Stack:
     def stop(self) -> None:
         for p in self.procs.values():
             if p.poll() is None:
-                p.terminate()
+                if sys.platform == "win32":
+                    subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], capture_output=True)
+                else:
+                    p.terminate()
         for p in self.procs.values():
             try:
-                p.wait(timeout=8)
+                p.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 p.kill()
         self.procs.clear()

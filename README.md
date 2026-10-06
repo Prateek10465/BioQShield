@@ -33,8 +33,7 @@ python scripts/run_all.py --fresh          # link + Hospital A + Hospital B
 
 | What | URL |
 |---|---|
-| Hospital A (sends) | http://localhost:8001 |
-| Hospital B (receives) | http://localhost:8002 |
+| Hospital Command Centre (Login & Choose Hospital) | http://localhost:8001 |
 | Link console: switch Eve, noise and message tampering on and off | http://localhost:8003 |
 
 The script prints demo logins for local use: `dr.rao` (clinician), `auditor`, `admin`.

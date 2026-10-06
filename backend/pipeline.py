@@ -1,12 +1,24 @@
 """One full QKD session: quantum transmission -> post-processing -> AES-256 record transfer."""
 from __future__ import annotations
 
+import json
 import time
 
 import numpy as np
 
-from quantum import bb84, postprocess as pp
-from . import crypto
+try:
+    from quantum import bb84, postprocess as pp
+except ImportError:
+    from backend.quantum import bb84, postprocess as pp
+
+try:
+    from . import crypto
+except ImportError:
+    try:
+        from backend import crypto
+    except ImportError:
+        import crypto
+
 
 SAMPLE_FRACTION = 0.25
 
@@ -15,8 +27,8 @@ def _stage(sid: str, title: str, status: str, metrics: list[list[str]], note: st
     return {"id": sid, "title": title, "status": status, "metrics": metrics, "note": note}
 
 
-def _skipped(sid: str, title: str) -> dict:
-    return _stage(sid, title, "skipped", [], "Not reached: session aborted earlier.")
+def _skipped(sid: str, title: str, note: str = "Not reached: session aborted earlier.") -> dict:
+    return _stage(sid, title, "skipped", [], note)
 
 
 def _pct(x: float) -> str:
@@ -30,6 +42,7 @@ def run_session(
     eve_rate: float = 1.0,
     eve_start: float = 0.0,
     seed: int | None = None,
+    complete: bool = True,
 ) -> dict:
     t0 = time.perf_counter()
     rng = np.random.default_rng(seed)
@@ -45,11 +58,39 @@ def run_session(
             "eve_start": eve_start,
         },
         "status": "aborted",
+        "status_description": (
+            "QKD protocol execution status: secure means the QKD session completed without "
+            "aborting; aborted means the QKD session failed or exceeded its security condition."
+        ),
         "reason": None,
-        "stats": {},
+        "stats": {
+            "display_rules": {
+                "fraction_metrics": [
+                    "noise",
+                    "qber_est",
+                    "qber_upper",
+                    "threshold",
+                    "sim_true_qber",
+                    "sim_eve_known_fraction",
+                ],
+                "ui_unit": "percent",
+                "multiply_by": 100,
+                "decimals": 1,
+            },
+            "key_available": False,
+        },
         "qber_trace": [],
         "stages": stages,
-        "record": None,
+        "record": {
+            "status": "blocked",
+            "plaintext": json.dumps(crypto.DEMO_RECORD, indent=2),
+            "nonce_hex": None,
+            "ciphertext_hex": None,
+            "ciphertext_bytes": None,
+            "decrypted": None,
+            "note": "Initiating secure session.",
+        },
+        "_t0": t0,
     }
 
     # 1. Quantum transmission ------------------------------------------------
@@ -195,37 +236,77 @@ def run_session(
     alice_aes = crypto.derive_aes_key(pp.bits_to_bytes(alice_final))
     bob_aes = crypto.derive_aes_key(pp.bits_to_bytes(bob_final))
 
-    # 6. Encrypted record transfer ---------------------------------------------
-    enc = crypto.encrypt_record(alice_aes)
-    decrypted = crypto.decrypt_record(bob_aes, enc["nonce"], enc["ciphertext"])
-    ok = decrypted is not None and decrypted == enc["plaintext"]
-    fp_a, fp_b = crypto.key_fingerprint(alice_aes), crypto.key_fingerprint(bob_aes)
-    stages.append(
-        _stage(
-            "aes",
-            "AES-256-GCM transfer",
-            "ok" if ok else "abort",
-            [
-                ["Alice key fingerprint", fp_a],
-                ["Bob key fingerprint", fp_b],
-                ["Record decrypted", "yes" if ok else "NO"],
-            ],
-            "The QKD key encrypts the patient record. Anyone tapping the line sees only ciphertext.",
-        )
-    )
-    ct_hex = enc["ciphertext"].hex()
-    result["record"] = {
-        "status": "delivered" if ok else "failed",
-        "plaintext": enc["plaintext"],
-        "nonce_hex": enc["nonce"].hex(),
-        "ciphertext_hex": ct_hex,
-        "ciphertext_bytes": len(enc["ciphertext"]),
-        "decrypted": decrypted,
-    }
-    result["status"] = "secure" if ok else "aborted"
-    result["reason"] = None if ok else "Decryption failed."
+    result["status"] = "secure"
+    result["reason"] = None
+    result["_alice_aes"] = alice_aes
+    result["_bob_aes"] = bob_aes
     result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
+
+    if complete:
+        return complete_transfer_with_policy(result, "ACCEPT", "")
     return result
+
+
+def complete_transfer_with_policy(session: dict, verdict: str, reason: str) -> dict:
+    """Finalize the AES transfer stage according to the security decision verdict.
+
+    - ACCEPT: Encrypt synthetic record with QKD key, decrypt on destination, deliver.
+    - MONITOR or REJECT: Never release key, do not encrypt, deliver status 'blocked'.
+    """
+    t0 = session.pop("_t0", time.perf_counter())
+    alice_aes = session.pop("_alice_aes", None)
+    bob_aes = session.pop("_bob_aes", None)
+
+    if verdict == "ACCEPT" and session["status"] == "secure" and alice_aes and bob_aes:
+        enc = crypto.encrypt_record(alice_aes)
+        decrypted = crypto.decrypt_record(bob_aes, enc["nonce"], enc["ciphertext"])
+        ok = decrypted is not None and decrypted == enc["plaintext"]
+        fp_a, fp_b = crypto.key_fingerprint(alice_aes), crypto.key_fingerprint(bob_aes)
+        session["stages"].append(
+            _stage(
+                "aes",
+                "AES-256-GCM transfer",
+                "ok" if ok else "abort",
+                [
+                    ["Alice key fingerprint", fp_a],
+                    ["Bob key fingerprint", fp_b],
+                    ["Record decrypted", "yes" if ok else "NO"],
+                ],
+                "The QKD key encrypts the patient record. Destination verified decryption.",
+            )
+        )
+        session["stats"]["key_available"] = bool(ok)
+        session["record"] = {
+            "status": "delivered" if ok else "failed",
+            "plaintext": enc["plaintext"],
+            "nonce_hex": enc["nonce"].hex(),
+            "ciphertext_hex": enc["ciphertext"].hex(),
+            "ciphertext_bytes": len(enc["ciphertext"]),
+            "decrypted": decrypted,
+        }
+        if not ok:
+            session["status"] = "aborted"
+            session["reason"] = "Decryption verification failed."
+    else:
+        # Key release blocked or session aborted earlier
+        session["stats"]["key_available"] = False
+        # If the aes stage hasn't already been added
+        if not any(st["id"] == "aes" for st in session["stages"]):
+            session["stages"].append(
+                _skipped(
+                    "aes",
+                    "AES-256-GCM transfer",
+                    f"Transfer blocked: {reason}" if reason else "Transfer blocked.",
+                )
+            )
+        session["record"] = {
+            "status": "blocked",
+            "plaintext": json.dumps(crypto.DEMO_RECORD, indent=2),
+            "note": f"Transfer blocked: {reason}" if reason else "Transfer blocked.",
+        }
+
+    session["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
+    return session
 
 
 def _abort(result: dict, reason: str, skipped: list[tuple[str, str]], t0: float) -> dict:
@@ -233,10 +314,11 @@ def _abort(result: dict, reason: str, skipped: list[tuple[str, str]], t0: float)
         result["stages"].append(_skipped(sid, title))
     result["status"] = "aborted"
     result["reason"] = reason
+    result["stats"]["key_available"] = False
     result["record"] = {
         "status": "blocked",
-        "plaintext": crypto.json.dumps(crypto.DEMO_RECORD, indent=2),
-        "note": "No secure key was established, so the record was never sent.",
+        "plaintext": json.dumps(crypto.DEMO_RECORD, indent=2),
+        "note": f"No secure key established: {reason}",
     }
     result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
     return result

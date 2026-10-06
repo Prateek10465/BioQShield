@@ -4,3 +4,9 @@ __pycache__/
 .venv/
 .env
 data/
+*.log
+FrontendV2/node_modules/
+FrontendV2/.next/
+FrontendV2/out/
+FrontendV2/tsconfig.tsbuildinfo
+FrontendV2/.pytest_cache/

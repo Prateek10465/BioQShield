@@ -33,12 +33,14 @@ def main() -> None:
         stack.stop()
         sys.exit(f"could not start: {e}")
     print(f"""
-MediQKD is running ({'ETSI 014 stub KME' if a.etsi else 'simulated BB84 link'})
+BioQShield Quantum Healthcare Network is running ({'ETSI 014 stub KME' if a.etsi else 'simulated BB84 link'})
 
-  Hospital A (sends)   {stack.alice}
-  Hospital B (receives) {stack.bob}
-  Link console (Eve)   {stack.link}
-{'  Stub KME             ' + stack.kme if a.etsi else ''}
+  🏥 Hospital Command Centre:  {stack.alice}
+     (Open here: login page lets you choose Hospital 1: Apollo or Hospital 2: Fortis)
+
+  🛰️ Link Console (Eve):       {stack.link}
+     (Quantum eavesdropping, photon tampering & channel noise simulation)
+{'  Stub KME:                   ' + stack.kme if a.etsi else ''}
 Demo logins (local use only):
   {'  '.join(f'{u} / {p}' for u, p in DEMO.items())}
 
