@@ -44,6 +44,7 @@ lock = threading.Lock()
 config = {"noise": 0.02, "eve": False, "eve_rate": 1.0, "eve_start": 0.0, "tamper": False}
 stats = {"qubits_sent": 0, "qubits_intercepted": 0, "eve_exact_bits": 0, "public_messages": 0, "tampered_messages": 0}
 wire: deque = deque(maxlen=500)
+demo_transfers: deque = deque(maxlen=100)
 _ids = itertools.count(1)
 in_flight: OrderedDict = OrderedDict()  # sid -> qubit states waiting for Bob's detector
 
@@ -143,6 +144,22 @@ def clear_wire() -> dict:
     with lock:
         wire.clear()
     return {"ok": True}
+
+
+@app.post("/api/demo-transfers")
+def add_demo_transfer(body: dict = Body(...)) -> dict:
+    allowed = ("transferId", "patient", "patientId", "department", "data", "destination", "verdict", "status", "threatScore", "qber")
+    entry = {key: body.get(key) for key in allowed}
+    entry["t"] = time.time()
+    with lock:
+        demo_transfers.appendleft(entry)
+    return {"ok": True}
+
+
+@app.get("/api/demo-transfers")
+def list_demo_transfers() -> dict:
+    with lock:
+        return {"transfers": list(demo_transfers)}
 
 
 # --------------------------------------------------------------------------- #

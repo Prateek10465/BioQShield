@@ -281,6 +281,29 @@ export async function fetchLinkState(): Promise<LinkState | null> {
   }
 }
 
+export async function publishDemoTransfer(transfer: {
+  transferId: string
+  patient: string
+  patientId: string
+  department: string
+  data: string
+  destination: string
+  verdict: string
+  status: string
+  threatScore: number
+  qber: number
+}): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/api/demo-transfer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(transfer),
+    })
+  } catch {
+    // The core transfer result is already stored locally; the console feed is demo-only.
+  }
+}
+
 // Initial seed history for demo
 const INITIAL_HISTORY: TransferHistoryItem[] = [
   {

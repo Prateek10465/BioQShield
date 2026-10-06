@@ -33,6 +33,7 @@ import {
   RunResponse,
   runSimulation,
   fetchLinkState,
+  publishDemoTransfer,
   saveTransferToHistory,
   TransferHistoryItem,
 } from '@/lib/api'
@@ -100,8 +101,8 @@ export function SecurityPipeline({ stages, verdict }: { stages: RunResponse['sta
         </div>
         <span
           className={`rounded-full px-3 py-1.5 text-[10px] font-semibold ${verdict === 'ACCEPT'
-              ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
-              : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
+            ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
+            : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
             }`}
         >
           {verdict === 'ACCEPT' ? 'Delivery Approved' : 'Transfer Held'}
@@ -116,18 +117,18 @@ export function SecurityPipeline({ stages, verdict }: { stages: RunResponse['sta
             <div key={st.id} className="relative">
               <div
                 className={`flex min-h-[116px] flex-col items-center rounded-xl border p-3 text-center transition ${isAbort
-                    ? 'border-[#F2D9DA] dark:border-[#DC4446]/30 bg-[#FFF9F9] dark:bg-[#DC4446]/10'
-                    : isOk
-                      ? 'border-[#B9E5D0] dark:border-[#22C55E]/30 bg-[#F6FCF8] dark:bg-[#22C55E]/10'
-                      : 'border-[#D9E2EC] dark:border-white/10 bg-[#F8FBFD] dark:bg-white/[0.02]'
+                  ? 'border-[#F2D9DA] dark:border-[#DC4446]/30 bg-[#FFF9F9] dark:bg-[#DC4446]/10'
+                  : isOk
+                    ? 'border-[#B9E5D0] dark:border-[#22C55E]/30 bg-[#F6FCF8] dark:bg-[#22C55E]/10'
+                    : 'border-[#D9E2EC] dark:border-white/10 bg-[#F8FBFD] dark:bg-white/[0.02]'
                   }`}
               >
                 <div
                   className={`flex size-8 items-center justify-center rounded-full ${isAbort
-                      ? 'bg-[#FDEBEC] text-[#DC4446]'
-                      : isOk
-                        ? 'bg-[#E8F7EF] text-[#22A06B]'
-                        : 'bg-[#EEF3F8] dark:bg-white/10 text-[#8A9AAD]'
+                    ? 'bg-[#FDEBEC] text-[#DC4446]'
+                    : isOk
+                      ? 'bg-[#E8F7EF] text-[#22A06B]'
+                      : 'bg-[#EEF3F8] dark:bg-white/10 text-[#8A9AAD]'
                     }`}
                 >
                   {isAbort ? (
@@ -193,10 +194,10 @@ export function ThreatScoreCard({ threat }: { threat: RunResponse['threat'] }) {
         <div className="h-2 overflow-hidden rounded-full bg-[#E8EEF3] dark:bg-white/10">
           <div
             className={`h-full rounded-full transition-all duration-500 ${threat.score >= 0.8
-                ? 'bg-[#DC4446]'
-                : threat.score >= 0.5
-                  ? 'bg-[#D97706]'
-                  : 'bg-[#22A06B]'
+              ? 'bg-[#DC4446]'
+              : threat.score >= 0.5
+                ? 'bg-[#D97706]'
+                : 'bg-[#22A06B]'
               }`}
             style={{ width: `${Math.min(threat.score * 100, 100)}%` }}
           />
@@ -260,8 +261,8 @@ export function QuantumChannelCard({ response }: { response: RunResponse }) {
 
       <div
         className={`mt-5 flex items-center gap-2 rounded-lg px-3 py-2.5 text-[10px] font-semibold ${eveActive
-            ? 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
-            : 'bg-[#EAF8F5] dark:bg-[#14B8A6]/15 text-[#128F7C] dark:text-[#67E8D9]'
+          ? 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
+          : 'bg-[#EAF8F5] dark:bg-[#14B8A6]/15 text-[#128F7C] dark:text-[#67E8D9]'
           }`}
       >
         {eveActive ? (
@@ -345,10 +346,10 @@ export function PolicyComparisonCard({ response }: { response: RunResponse }) {
             <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#9AAABD]">Static Policy</span>
             <span
               className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${stat.verdict === 'ACCEPT'
-                  ? 'bg-[#E8F7EF] text-[#198657]'
-                  : stat.verdict === 'MONITOR'
-                    ? 'bg-[#FFF5E7] text-[#B76405]'
-                    : 'bg-[#FDEBEC] text-[#C33E42]'
+                ? 'bg-[#E8F7EF] text-[#198657]'
+                : stat.verdict === 'MONITOR'
+                  ? 'bg-[#FFF5E7] text-[#B76405]'
+                  : 'bg-[#FDEBEC] text-[#C33E42]'
                 }`}
             >
               {stat.verdict}
@@ -367,10 +368,10 @@ export function PolicyComparisonCard({ response }: { response: RunResponse }) {
             <span className="text-[11px] font-semibold text-[#2563EB] dark:text-[#67E8F9]">Adaptive Policy</span>
             <span
               className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${adap.verdict === 'ACCEPT'
-                  ? 'bg-[#E8F7EF] text-[#198657]'
-                  : adap.verdict === 'MONITOR'
-                    ? 'bg-[#FFF5E7] text-[#B76405]'
-                    : 'bg-[#FDEBEC] text-[#C33E42]'
+                ? 'bg-[#E8F7EF] text-[#198657]'
+                : adap.verdict === 'MONITOR'
+                  ? 'bg-[#FFF5E7] text-[#B76405]'
+                  : 'bg-[#FDEBEC] text-[#C33E42]'
                 }`}
             >
               {adap.verdict}
@@ -419,8 +420,8 @@ export function ProtectedRecordSection({
         </div>
         <span
           className={`rounded-full px-3 py-1 text-[10px] font-bold ${accepted
-              ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
-              : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
+            ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
+            : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
             }`}
         >
           {accepted ? 'RECORD DELIVERED' : 'RECORD BLOCKED'}
@@ -511,7 +512,7 @@ export function SecurityAnalysisExperience() {
   const [response, setResponse] = useState<RunResponse | null>(null)
   const [transferContext, setTransferContext] = useState<any>(null)
 
-  const executeAnalysis = async (params: RunParams) => {
+  const executeAnalysis = async (params: RunParams, context = transferContext) => {
     setLoading(true)
     setError(null)
     try {
@@ -524,13 +525,13 @@ export function SecurityAnalysisExperience() {
       const historyItem: TransferHistoryItem = {
         id: `BQS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
         timestamp: 'Just now',
-        patient: transferContext?.patient?.name || 'Synthetic Patient',
-        patientId: transferContext?.patient?.id || 'PT-2048',
-        department: transferContext?.patient?.department || 'Cardiology',
-        data: transferContext?.documents ? transferContext.documents.join(' · ') : 'Clinical Summary',
-        destination: transferContext?.destination || 'Fortis Hospital Network',
-        scope: transferContext?.scope || 'Hospital Network',
-        branch: transferContext?.branch,
+        patient: context?.patient?.name || 'Synthetic Patient',
+        patientId: context?.patient?.id || 'PT-2048',
+        department: context?.patient?.department || 'Cardiology',
+        data: context?.documents ? context.documents.join(' · ') : 'Clinical Summary',
+        destination: context?.destination || 'Fortis Hospital Network',
+        scope: context?.scope || 'Hospital Network',
+        branch: context?.branch,
         verdict: res.decision.verdict,
         status: res.decision.verdict === 'ACCEPT' ? 'Delivered' : 'Blocked',
         threatScore: res.threat ? res.threat.score : 0.0,
@@ -539,6 +540,18 @@ export function SecurityAnalysisExperience() {
         runResponse: res,
       }
       saveTransferToHistory(historyItem)
+      await publishDemoTransfer({
+        transferId: historyItem.id,
+        patient: historyItem.patient,
+        patientId: historyItem.patientId,
+        department: historyItem.department,
+        data: historyItem.data,
+        destination: historyItem.destination,
+        verdict: historyItem.verdict,
+        status: historyItem.status,
+        threatScore: historyItem.threatScore,
+        qber: historyItem.qber,
+      })
     } catch (err: any) {
       setError(err?.message || 'Failed to complete security analysis.')
     } finally {
@@ -565,6 +578,8 @@ export function SecurityAnalysisExperience() {
           const parsed = JSON.parse(stored)
           setTransferContext(parsed)
           if (parsed.params) p = parsed.params
+          executeAnalysis(p, parsed)
+          return
         } catch { }
       }
     }
@@ -656,8 +671,8 @@ export function SecurityAnalysisExperience() {
         </div>
         <div
           className={`flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold ${verdict === 'ACCEPT'
-              ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
-              : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
+            ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
+            : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
             }`}
         >
           {verdict === 'ACCEPT' ? <CheckCircle2 className="size-4" /> : <XCircle className="size-4" />}

@@ -15,6 +15,7 @@ import subprocess
 import sys
 import threading
 import time
+import httpx
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -284,6 +285,15 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
     def link_state() -> dict:
         """Expose simulator conditions to the unauthenticated V2 security workflow."""
         return link_probe()
+
+    @app.post("/api/demo-transfer")
+    def demo_transfer(body: dict) -> dict:
+        """Forward synthetic transfer metadata to the local hackathon link console."""
+        try:
+            response = httpx.post(f"{cfg.channel_url}/api/demo-transfers", json=body, timeout=2)
+            return {"ok": response.is_success}
+        except httpx.HTTPError:
+            return {"ok": False}
 
     # ---- quantum simulation & threat endpoints ----------------------------------------
     @app.post("/api/run")

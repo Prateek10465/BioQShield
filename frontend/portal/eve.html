@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,11 +9,13 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/portal/eve.css">
 </head>
+
 <body>
   <header class="top">
     <div>
       <h1>Link console</h1>
-      <p class="lede">Everything that crosses the line between the two hospitals, and the switches that change what an attacker can do to it.</p>
+      <p class="lede">Everything that crosses the line between the two hospitals, and the switches that change what an
+        attacker can do to it.</p>
     </div>
     <p class="sim" role="note">Simulation controls. On a real fibre nobody can switch an attacker on or off.</p>
   </header>
@@ -33,14 +36,19 @@
           <label for="eve">Eavesdropper on the fibre</label>
           <input type="checkbox" id="eve" role="switch">
         </div>
-        <p class="help">Eve measures each qubit she intercepts and sends a new one on. That disturbs the qubit, and Alice and Bob see it as extra errors.</p>
-        <div class="slider"><label for="eve_rate">Share of qubits intercepted <output id="eve_rate_o"></output></label><input type="range" id="eve_rate" min="0" max="100" step="5"></div>
-        <div class="slider"><label for="eve_start">Eve starts partway through <output id="eve_start_o"></output></label><input type="range" id="eve_start" min="0" max="95" step="5"></div>
+        <p class="help">Eve measures each qubit she intercepts and sends a new one on. That disturbs the qubit, and
+          Alice and Bob see it as extra errors.</p>
+        <div class="slider"><label for="eve_rate">Share of qubits intercepted <output
+              id="eve_rate_o"></output></label><input type="range" id="eve_rate" min="0" max="100" step="5"></div>
+        <div class="slider"><label for="eve_start">Eve starts partway through <output
+              id="eve_start_o"></output></label><input type="range" id="eve_start" min="0" max="95" step="5"></div>
       </div>
 
       <div class="control">
-        <div class="slider"><label for="noise">Fibre noise <output id="noise_o"></output></label><input type="range" id="noise" min="0" max="20" step="0.5"></div>
-        <p class="help">Ordinary errors that nobody caused. Below about 11% the keys can still be made; above it the protocol stops.</p>
+        <div class="slider"><label for="noise">Fibre noise <output id="noise_o"></output></label><input type="range"
+            id="noise" min="0" max="20" step="0.5"></div>
+        <p class="help">Ordinary errors that nobody caused. Below about 11% the keys can still be made; above it the
+          protocol stops.</p>
       </div>
 
       <div class="control">
@@ -48,7 +56,8 @@
           <label for="tamper">Alter public messages</label>
           <input type="checkbox" id="tamper" role="switch">
         </div>
-        <p class="help">Rewrites one value in each protocol message in flight. Every message is signed, so the receiver should refuse them.</p>
+        <p class="help">Rewrites one value in each protocol message in flight. Every message is signed, so the receiver
+          should refuse them.</p>
       </div>
 
       <h2>Totals</h2>
@@ -64,11 +73,21 @@
           <button type="button" class="chipbtn" id="clear">Clear log</button>
         </div>
       </div>
-      <p class="help" id="wire-help">Protocol messages are public by design: readable, but signed. Record contents travel as ciphertext.</p>
+      <p class="help" id="wire-help">Protocol messages are public by design: readable, but signed. Record contents
+        travel as ciphertext.</p>
       <ol id="log" class="log" aria-live="off"></ol>
       <p class="empty" id="empty">Nothing on the wire yet. Send a record from Hospital A and it appears here.</p>
+    </section>
+
+    <section class="demo-transfers" aria-label="Synthetic demo transfer activity">
+      <h2>Demo transfer activity</h2>
+      <p class="help">Synthetic metadata for the hackathon demo. This summary is separate from the public wire and does
+        not represent patient data sent over the channel.</p>
+      <ol id="demo-transfers" class="log"></ol>
+      <p class="empty" id="demo-empty">No V2 transfer has been evaluated yet.</p>
     </section>
   </div>
   <script src="/portal/eve.js"></script>
 </body>
+
 </html>

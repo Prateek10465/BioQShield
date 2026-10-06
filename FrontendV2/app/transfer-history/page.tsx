@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { AppShell } from '@/components/bioqshield'
+import { TransferDetailClient } from '@/components/transfer-detail-client'
 import { CheckCircle2, Clock3, Eye, FileText, Search, ShieldAlert, XCircle } from 'lucide-react'
 import { getTransferHistory, TransferHistoryItem } from '@/lib/api'
 
 export default function TransferHistoryPage() {
+  const pathname = usePathname()
   const [history, setHistory] = useState<TransferHistoryItem[]>([])
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -34,6 +37,11 @@ export default function TransferHistoryPage() {
 
     return matchesQuery && matchesStatus && matchesDestination
   })
+
+  const detailMatch = pathname.match(/^\/transfer-history\/([^/]+)\/?$/)
+  if (detailMatch) {
+    return <TransferDetailClient initialId={decodeURIComponent(detailMatch[1])} />
+  }
 
   return (
     <AppShell>

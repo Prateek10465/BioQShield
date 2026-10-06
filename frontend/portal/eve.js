@@ -5,9 +5,9 @@
   const $ = (id) => document.getElementById(id);
   const post = (path, body) => fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) }).then((r) => r.json());
   const PRESETS = {
-    clean:  { eve: false, noise: 0.02, tamper: false },
-    noisy:  { eve: false, noise: 0.05, tamper: false },
-    eve:    { eve: true, eve_rate: 1.0, eve_start: 0.0, noise: 0.02, tamper: false },
+    clean: { eve: false, noise: 0.02, tamper: false },
+    noisy: { eve: false, noise: 0.05, tamper: false },
+    eve: { eve: true, eve_rate: 1.0, eve_start: 0.0, noise: 0.02, tamper: false },
     tamper: { eve: false, noise: 0.02, tamper: true },
   };
   let last = 0;
@@ -41,8 +41,8 @@
 
   function paintStats(s) {
     const rows = [["Qubits sent", s.qubits_sent, false], ["Intercepted by Eve", s.qubits_intercepted, s.qubits_intercepted > 0],
-      ["Bits Eve knows exactly", s.eve_exact_bits, s.eve_exact_bits > 0], ["Public messages", s.public_messages, false],
-      ["Messages altered", s.tampered_messages, s.tampered_messages > 0]];
+    ["Bits Eve knows exactly", s.eve_exact_bits, s.eve_exact_bits > 0], ["Public messages", s.public_messages, false],
+    ["Messages altered", s.tampered_messages, s.tampered_messages > 0]];
     $("stats").replaceChildren(...rows.flatMap(([k, v, hot]) => [el("dt", "", k), el("dd", hot ? "hot" : "", v.toLocaleString())]));
   }
 
@@ -107,10 +107,25 @@
     g.li.querySelector(".what").textContent = `Error correction: ${g.n} parity questions and answers (session ${String(e.sid).slice(0, 6)}). Parities of random blocks, never the bits themselves.`;
   }
 
+  function paintDemoTransfers(items) {
+    const log = $("demo-transfers");
+    log.replaceChildren();
+    $("demo-empty").hidden = items.length > 0;
+    for (const item of items) {
+      const li = el("li", `entry demo ${item.status === "Blocked" ? "bad" : ""}`);
+      li.append(el("span", "when", time(item.t)));
+      li.append(el("span", "tag", item.status || "Evaluated"));
+      li.append(el("span", "what", `${item.patient} (${item.patientId}) → ${item.destination}`));
+      li.append(el("span", "preview", `${item.data} · ${item.verdict} · QBER ${Number(item.qber || 0).toFixed(1)}% · threat ${Number(item.threatScore || 0).toFixed(2)}`));
+      log.append(li);
+    }
+  }
+
   async function tick() {
     if (document.hidden) return;
     let r;
     try { r = await (await fetch("/api/wire?after=" + last)).json(); } catch { return; }
+    try { paintDemoTransfers((await (await fetch("/api/demo-transfers")).json()).transfers || []); } catch { }
     cfg = r.config; paintControls(); paintStats(r.stats);
     if ($("pause").checked || !r.entries.length) return;
     last = r.last;
