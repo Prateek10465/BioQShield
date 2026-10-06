@@ -10,6 +10,7 @@ console, where you switch Eve on and off, is at http://localhost:8003.
 Ctrl-C stops everything.
 """
 import argparse
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -19,6 +20,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.stack import DEMO, ROOT, Stack  # noqa: E402
 
 
+def build_frontend() -> None:
+    """Export FrontendV2 into the static frontend served by the hospital apps."""
+    command = [sys.executable, str(ROOT / "scripts" / "build_frontend.py")]
+    try:
+        subprocess.run(command, cwd=ROOT, check=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError("Python is required to build FrontendV2 before starting the stack.") from exc
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError("FrontendV2 build failed; the hospital services were not started.") from exc
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--etsi", action="store_true")
@@ -26,6 +38,10 @@ def main() -> None:
     ap.add_argument("--data", default=str(ROOT / "data"))
     a = ap.parse_args()
     ports = {"alice": 8001, "bob": 8002, "link": 8003, "kme": 8004}
+    try:
+        build_frontend()
+    except RuntimeError as e:
+        sys.exit(f"could not build frontend: {e}")
     stack = Stack(Path(a.data), etsi=a.etsi, ports=ports, fresh=a.fresh)
     try:
         stack.start()
