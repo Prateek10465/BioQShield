@@ -148,7 +148,7 @@ def clear_wire() -> dict:
 
 @app.post("/api/demo-transfers")
 def add_demo_transfer(body: dict = Body(...)) -> dict:
-    allowed = ("transferId", "patient", "patientId", "department", "data", "destination", "verdict", "status", "threatScore", "qber")
+    allowed = ("transferId", "patient", "patientId", "department", "data", "destination", "verdict", "status", "threatScore", "qber", "timestamp")
     entry = {key: body.get(key) for key in allowed}
     entry["t"] = time.time()
     with lock:

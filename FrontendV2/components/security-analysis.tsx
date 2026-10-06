@@ -33,6 +33,7 @@ import {
   RunResponse,
   runSimulation,
   fetchLinkState,
+  formatTransferTimestamp,
   publishDemoTransfer,
   saveTransferToHistory,
   TransferHistoryItem,
@@ -522,9 +523,11 @@ export function SecurityAnalysisExperience() {
       setResponse(res)
 
       // Save to local transfer history
+      const now = new Date()
       const historyItem: TransferHistoryItem = {
-        id: `BQS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
-        timestamp: 'Just now',
+        id: `BQS-${now.getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
+        timestamp: formatTransferTimestamp(now),
+        createdAt: now.toISOString(),
         patient: context?.patient?.name || 'Synthetic Patient',
         patientId: context?.patient?.id || 'PT-2048',
         department: context?.patient?.department || 'Cardiology',
@@ -551,6 +554,7 @@ export function SecurityAnalysisExperience() {
         status: historyItem.status,
         threatScore: historyItem.threatScore,
         qber: historyItem.qber,
+        timestamp: historyItem.timestamp,
       })
     } catch (err: any) {
       setError(err?.message || 'Failed to complete security analysis.')

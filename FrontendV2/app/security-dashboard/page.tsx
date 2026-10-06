@@ -11,7 +11,7 @@ import {
   TechCard,
   TechnicalPage,
 } from '@/components/technical-security'
-import { getLatestTransfer, getTransferHistory, TransferHistoryItem } from '@/lib/api'
+import { formatTransferTimestamp, getLatestTransfer, getTransferHistory, TransferHistoryItem } from '@/lib/api'
 
 export default function SecurityDashboardPage() {
   const [history, setHistory] = useState<TransferHistoryItem[]>([])
@@ -28,7 +28,7 @@ export default function SecurityDashboardPage() {
 
   const currentItem = latest || {
     id: 'BQS-2026-004821',
-    timestamp: 'Today · 10:42 AM',
+    timestamp: formatTransferTimestamp(new Date(Date.now() - 42 * 60 * 1000)),
     patient: 'John Doe',
     patientId: 'PT-20491',
     department: 'Cardiology',

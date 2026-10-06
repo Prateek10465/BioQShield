@@ -215,6 +215,7 @@ export interface QiskitDemoResponse {
 export interface TransferHistoryItem {
   id: string
   timestamp: string
+  createdAt?: string
   patient: string
   patientId: string
   department: string
@@ -228,6 +229,67 @@ export interface TransferHistoryItem {
   qber: number
   keyBits: number
   runResponse?: RunResponse
+}
+
+export function formatTransferTimestamp(dateInput?: string | Date | number): string {
+  if (!dateInput) {
+    dateInput = new Date()
+  }
+
+  // If already a string
+  if (typeof dateInput === 'string') {
+    const trimmed = dateInput.trim()
+    // Auto-fix the legacy placeholder bug
+    if (trimmed.toLowerCase() === 'just now') {
+      return formatTransferTimestamp(new Date())
+    }
+    // Check if it's an ISO string or standard parseable datetime
+    const parsed = new Date(trimmed)
+    if (!isNaN(parsed.getTime()) && (trimmed.includes('T') || trimmed.includes('-') || trimmed.includes('/'))) {
+      dateInput = parsed
+    } else {
+      // If it's already nicely formatted (e.g. "Today · 10:42 AM"), return it directly
+      return trimmed
+    }
+  }
+
+  const date = typeof dateInput === 'number' ? new Date(dateInput) : (dateInput as Date)
+  if (isNaN(date.getTime())) {
+    return formatTransferTimestamp(new Date())
+  }
+
+  const now = new Date()
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear()
+
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+
+  const timeStr = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  if (isToday) {
+    return `Today · ${timeStr}`
+  }
+  if (isYesterday) {
+    return `Yesterday · ${timeStr}`
+  }
+
+  const dateStr = date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+  return `${dateStr} · ${timeStr}`
 }
 
 // Fallback base URL for direct client-side fetch if proxy rewrite is bypassed
@@ -314,6 +376,7 @@ export async function publishDemoTransfer(transfer: {
   status: string
   threatScore: number
   qber: number
+  timestamp?: string
 }): Promise<void> {
   try {
     await fetch(`${API_BASE}/api/demo-transfer`, {
@@ -327,10 +390,16 @@ export async function publishDemoTransfer(transfer: {
 }
 
 // Initial seed history for demo
+const nowSeed = new Date()
+const seed1 = new Date(nowSeed.getTime() - 42 * 60 * 1000)
+const seed2 = new Date(nowSeed.getTime() - 135 * 60 * 1000)
+const seed3 = new Date(nowSeed.getTime() - 22 * 60 * 60 * 1000)
+
 const INITIAL_HISTORY: TransferHistoryItem[] = [
   {
     id: 'BQS-2026-004821',
-    timestamp: 'Today · 10:42 AM',
+    timestamp: formatTransferTimestamp(seed1),
+    createdAt: seed1.toISOString(),
     patient: 'John Doe',
     patientId: 'PT-20491',
     department: 'Cardiology',
@@ -345,7 +414,8 @@ const INITIAL_HISTORY: TransferHistoryItem[] = [
   },
   {
     id: 'BQS-2026-004820',
-    timestamp: 'Today · 09:18 AM',
+    timestamp: formatTransferTimestamp(seed2),
+    createdAt: seed2.toISOString(),
     patient: 'Sarah Wilson',
     patientId: 'PT-18372',
     department: 'Neurology',
@@ -361,7 +431,8 @@ const INITIAL_HISTORY: TransferHistoryItem[] = [
   },
   {
     id: 'BQS-2026-004819',
-    timestamp: 'Yesterday · 04:30 PM',
+    timestamp: formatTransferTimestamp(seed3),
+    createdAt: seed3.toISOString(),
     patient: 'Michael Carter',
     patientId: 'PT-17283',
     department: 'Oncology',
@@ -384,7 +455,45 @@ export function getTransferHistory(): TransferHistoryItem[] {
       localStorage.setItem('bioqshield_transfer_history', JSON.stringify(INITIAL_HISTORY))
       return INITIAL_HISTORY
     }
-    return JSON.parse(stored)
+    const parsed: TransferHistoryItem[] = JSON.parse(stored)
+    let modified = false
+    const sanitized = parsed.map((item, idx) => {
+      let changed = false
+      let ts = item.timestamp
+      let createdAt = item.createdAt
+
+      if (!createdAt) {
+        if (ts && ts.toLowerCase() !== 'just now') {
+          createdAt = new Date(Date.now() - (idx + 1) * 35 * 60 * 1000).toISOString()
+        } else {
+          createdAt = new Date().toISOString()
+        }
+        changed = true
+      }
+
+      if (!ts || ts.trim().toLowerCase() === 'just now') {
+        ts = formatTransferTimestamp(createdAt)
+        changed = true
+      } else if (createdAt) {
+        const recomputed = formatTransferTimestamp(createdAt)
+        if (recomputed !== ts && (ts.startsWith('Today') || ts.startsWith('Yesterday'))) {
+          ts = recomputed
+          changed = true
+        }
+      }
+
+      if (changed) modified = true
+      return {
+        ...item,
+        timestamp: ts,
+        createdAt,
+      }
+    })
+
+    if (modified) {
+      localStorage.setItem('bioqshield_transfer_history', JSON.stringify(sanitized))
+    }
+    return sanitized
   } catch {
     return INITIAL_HISTORY
   }
@@ -393,10 +502,19 @@ export function getTransferHistory(): TransferHistoryItem[] {
 export function saveTransferToHistory(item: TransferHistoryItem): void {
   if (typeof window === 'undefined') return
   try {
+    const nowIso = item.createdAt || new Date().toISOString()
+    const validTimestamp = formatTransferTimestamp(
+      item.timestamp && item.timestamp.toLowerCase() !== 'just now' ? item.timestamp : nowIso
+    )
+    const normalizedItem: TransferHistoryItem = {
+      ...item,
+      createdAt: nowIso,
+      timestamp: validTimestamp,
+    }
     const existing = getTransferHistory()
-    const updated = [item, ...existing.filter((x) => x.id !== item.id)]
+    const updated = [normalizedItem, ...existing.filter((x) => x.id !== item.id)]
     localStorage.setItem('bioqshield_transfer_history', JSON.stringify(updated))
-    localStorage.setItem('bioqshield_latest_run', JSON.stringify(item))
+    localStorage.setItem('bioqshield_latest_run', JSON.stringify(normalizedItem))
   } catch (err) {
     console.error('Failed to save transfer to history', err)
   }
@@ -406,7 +524,22 @@ export function getLatestTransfer(): TransferHistoryItem | null {
   if (typeof window === 'undefined') return INITIAL_HISTORY[0]
   try {
     const stored = localStorage.getItem('bioqshield_latest_run')
-    if (stored) return JSON.parse(stored)
+    if (stored) {
+      const item: TransferHistoryItem = JSON.parse(stored)
+      let changed = false
+      if (!item.timestamp || item.timestamp.trim().toLowerCase() === 'just now') {
+        item.timestamp = formatTransferTimestamp(item.createdAt || new Date())
+        changed = true
+      }
+      if (!item.createdAt) {
+        item.createdAt = new Date().toISOString()
+        changed = true
+      }
+      if (changed) {
+        localStorage.setItem('bioqshield_latest_run', JSON.stringify(item))
+      }
+      return item
+    }
     const history = getTransferHistory()
     return history[0] || null
   } catch {

@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   XCircle,
 } from 'lucide-react'
-import { getTransferById, TransferHistoryItem } from '@/lib/api'
+import { formatTransferTimestamp, getTransferById, TransferHistoryItem } from '@/lib/api'
 
 export function TransferDetailClient({ initialId }: { initialId: string }) {
   const id = initialId || 'BQS-2026-004821'
@@ -25,13 +25,20 @@ export function TransferDetailClient({ initialId }: { initialId: string }) {
   useEffect(() => {
     const found = getTransferById(id)
     if (found) {
-      setItem(found)
+      if (!found.timestamp || found.timestamp.trim().toLowerCase() === 'just now') {
+        setItem({
+          ...found,
+          timestamp: formatTransferTimestamp(found.createdAt || new Date()),
+        })
+      } else {
+        setItem(found)
+      }
     } else {
       // Fallback seed for direct links
       const isBlocked = id.includes('820') || id.includes('819')
       setItem({
         id,
-        timestamp: '14 October 2026 · 10:42 AM',
+        timestamp: formatTransferTimestamp(new Date(Date.now() - 42 * 60 * 1000)),
         patient: 'John Doe',
         patientId: 'PT-20491',
         department: 'Cardiology',
