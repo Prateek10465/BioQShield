@@ -108,7 +108,9 @@ class LinkConfig(BaseModel):
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True, "role": "link"}
+    with lock:
+        active = {key: config[key] for key in ("eve", "eve_rate", "eve_start", "noise", "tamper")}
+    return {"ok": True, "role": "link", **active}
 
 
 @app.get("/api/config")

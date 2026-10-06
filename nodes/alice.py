@@ -64,10 +64,13 @@ def create_app(cfg: Config | None = None, *, kme_http=None, now=time.time) -> Fa
 
         def probe() -> dict:
             try:
-                ok = httpx.get(f"{cfg.channel_url}/api/health", timeout=2).status_code == 200
+                response = httpx.get(f"{cfg.channel_url}/api/health", timeout=2)
+                ok = response.status_code == 200
+                state = response.json() if ok else {}
             except httpx.HTTPError:
                 ok = False
-            return {"reachable": ok, "source": "bb84", "last_session": runner.last and {
+                state = {}
+            return {"reachable": ok, "source": "bb84", **{key: state[key] for key in ("eve", "eve_rate", "eve_start", "noise", "tamper") if key in state}, "last_session": runner.last and {
                 k: runner.last[k] for k in ("sid", "status", "kind", "reason", "elapsed_ms")}}
 
     km = KeyManager(store, source, audit, cfg, now)
@@ -104,6 +107,12 @@ def create_app(cfg: Config | None = None, *, kme_http=None, now=time.time) -> Fa
             raise HTTPException(404, "no such record")
         if rec["status"] == "sent":
             raise HTTPException(409, "this record was already sent")
+        link = probe()
+        has_existing_keys = store.available_count(now(), 60) > 0
+        if link.get("eve") and has_existing_keys:
+            reason = "Eavesdropper is active on the link; secure transfer blocked until the link is clean."
+            audit.record(user.username, "transfer_blocked", record=rec_id, reason=reason)
+            raise HTTPException(503, {"code": "no_secure_key", "message": reason, "session": None})
         try:
             key_id, key = km.acquire(user.username)
         except KeyUnavailable as e:

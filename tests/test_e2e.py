@@ -117,6 +117,21 @@ def test_an_eavesdropper_blocks_the_transfer_and_the_record_stays_a_draft(rig):
     assert any(x["title"] == "Must not travel" for x in rig.inbox())
 
 
+def test_eavesdropper_blocks_existing_keys_too(rig):
+    rig.reset()
+    made = httpx.post(rig.st.alice + "/api/keys/refill", headers=rig.a, timeout=T).json()
+    assert made["status"] == "ok" and rig.pool("alice")["available"] > 0
+    rig.link(eve=True, eve_rate=1.0, eve_start=0.0)
+    rid = rig.draft(title="Blocked with pre-existing key")
+    r = rig.send(rid)
+    assert r.status_code == 503, r.text
+    assert r.json()["detail"]["code"] == "no_secure_key"
+    assert "Eavesdropper is active" in r.json()["detail"]["message"]
+    assert rig.status(rid) == "draft"
+    assert not any(x["title"] == "Blocked with pre-existing key" for x in rig.inbox())
+    rig.link(eve=False)
+
+
 def test_partial_eavesdropping_is_still_caught(rig):
     rig.reset()
     rig.rotate()
