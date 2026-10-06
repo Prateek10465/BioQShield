@@ -116,6 +116,7 @@ def style_css() -> PlainTextResponse:
 
 # Helper route for clean subpath URLs without trailing slashes
 KNOWN_PAGES = [
+    "dashboard",
     "quantum-console",
     "secure-transfer",
     "security-analysis",

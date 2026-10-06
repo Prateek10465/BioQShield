@@ -337,8 +337,9 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
             return Response(content="", media_type="text/x-component")
 
         if page_name in ("", "index"):
-            if (FRONTEND / "index.html").exists():
-                return FileResponse(FRONTEND / "index.html")
+            login_page = FRONTEND / "login" / "index.html"
+            if login_page.exists():
+                return FileResponse(login_page)
             raise HTTPException(503, "FrontendV2 static build is not available. Run scripts/build_frontend.py.")
 
         p_dir = FRONTEND / page_name / "index.html"
@@ -350,6 +351,7 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
         return FileResponse(FRONTEND / "index.html")
 
     KNOWN_PAGES = [
+        "dashboard",
         "login",
         "quantum-console",
         "secure-transfer",

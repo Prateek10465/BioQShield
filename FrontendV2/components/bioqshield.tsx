@@ -46,7 +46,7 @@ import { useSidebar, useTheme } from './theme-provider'
 import { getAuthUser, setAuthUser, getLatestTransfer, getTransferHistory, logoutUser, TransferHistoryItem, AuthUser, HOSPITALS, HospitalDef, getHospitalById } from '@/lib/api'
 
 const navItems = [
-  { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { label: 'Dashboard', href: '/dashboard/', icon: LayoutDashboard },
   { label: 'Secure Transfer', href: '/secure-transfer/', icon: Send },
   { label: 'Security Dashboard', href: '/security-dashboard/', icon: ShieldCheck },
   { label: 'Scenario Comparison', href: '/scenario-comparison/', icon: BarChart3 },
@@ -802,7 +802,7 @@ export function Login() {
       initials: matchedUser.initials,
       isLoggedIn: true,
     })
-    window.location.href = '/'
+    window.location.href = '/dashboard/'
   }
 
   const accentColor = selectedHospital?.accent || '#2563EB'
