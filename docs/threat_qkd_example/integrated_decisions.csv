@@ -1,0 +1,13 @@
+quantum,engine,traffic,threat,qber,key_bits,action,why
+clean fibre,numpy,normal traffic,0.04925938078127194,0.01568627450980392,869,ACCEPT,"QBER 1.6% within 4.9%, key 869 bits"
+clean fibre,numpy,mixed (20% attack),0.22328053541271925,0.01568627450980392,869,ACCEPT,"QBER 1.6% within 4.6%, key 869 bits"
+clean fibre,numpy,attack traffic,0.9488168122992701,0.01568627450980392,869,MONITOR,QBER is clean but network threat is high (0.95): classical side may be under attack
+noisy fibre (4%),numpy,normal traffic,0.04925938078127194,0.032,532,ACCEPT,"QBER 3.2% within 4.9%, key 532 bits"
+noisy fibre (4%),numpy,mixed (20% attack),0.22328053541271925,0.032,532,ACCEPT,"QBER 3.2% within 4.6%, key 532 bits"
+noisy fibre (4%),numpy,attack traffic,0.9488168122992701,0.032,532,MONITOR,QBER is clean but network threat is high (0.95): classical side may be under attack
+partial Eve (10%),numpy,normal traffic,0.04925938078127194,0.052123552123552123,236,MONITOR,QBER 5.2% above accept limit 4.9%: noise or a partial eavesdropper; QBER 5.4 sigma above this link's baseline 1.8%; only 236 secret bits left (need 256): no usable key from this session
+partial Eve (10%),numpy,mixed (20% attack),0.22328053541271925,0.052123552123552123,236,MONITOR,QBER 5.2% above accept limit 4.6%: noise or a partial eavesdropper; QBER 5.4 sigma above this link's baseline 1.8%; only 236 secret bits left (need 256): no usable key from this session
+partial Eve (10%),numpy,attack traffic,0.9488168122992701,0.052123552123552123,236,REJECT,QBER 5.2% above accept limit 3.5% while network threat is high (0.95); QBER 5.4 sigma above this link's baseline 1.8%; only 236 secret bits left (need 256): no usable key from this session
+full Eve,numpy,normal traffic,0.04925938078127194,0.2966601178781925,0,REJECT,QBER 29.7% above the 11% limit: no secret key can be trusted
+full Eve,numpy,mixed (20% attack),0.22328053541271925,0.2966601178781925,0,REJECT,QBER 29.7% above the 11% limit: no secret key can be trusted
+full Eve,numpy,attack traffic,0.9488168122992701,0.2966601178781925,0,REJECT,QBER 29.7% above the 11% limit: no secret key can be trusted

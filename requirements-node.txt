@@ -1,0 +1,6 @@
+# What the hospital services, the link service and the stub KME need at run time.
+fastapi>=0.110
+uvicorn>=0.29
+numpy>=1.26
+cryptography>=42
+httpx>=0.27

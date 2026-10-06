@@ -1,0 +1,37 @@
+# Keys from an ETSI GS QKD 014 key manager instead of the simulated BB84 link.
+# Here the key manager is a stub that makes random keys: it shows the interface, it is NOT
+# quantum. To use real hardware, drop the `kme` service and point QKD_KME_URL at your vendor's
+# KME (add mTLS with QKD_KME_CA / QKD_KME_CERT / QKD_KME_KEY).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.etsi.yml up --build
+
+services:
+  kme:
+    build: .
+    image: mediqkd:latest
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    command: ["python", "-m", "uvicorn", "nodes.etsi_stub:app", "--host", "0.0.0.0", "--port", "8004"]
+    environment:
+      PORT: "8004"
+      STUB_SAE_KEYS: hospital-a:${KME_API_KEY_A:?run python scripts/make_env.py first},hospital-b:${KME_API_KEY_B:?run python scripts/make_env.py first}
+    ports: ["127.0.0.1:8004:8004"]
+
+  alice:
+    environment:
+      QKD_KEY_SOURCE: etsi014
+      QKD_KME_URL: http://kme:8004
+      QKD_KME_API_KEY: ${KME_API_KEY_A:?run python scripts/make_env.py first}
+    depends_on:
+      kme: {condition: service_healthy}
+
+  bob:
+    environment:
+      QKD_KEY_SOURCE: etsi014
+      QKD_KME_URL: http://kme:8004
+      QKD_KME_API_KEY: ${KME_API_KEY_B:?run python scripts/make_env.py first}
+    depends_on:
+      kme: {condition: service_healthy}

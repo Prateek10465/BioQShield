@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Link console – MediQKD</title>
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/portal/eve.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Link console</h1>
+      <p class="lede">Everything that crosses the line between the two hospitals, and the switches that change what an attacker can do to it.</p>
+    </div>
+    <p class="sim" role="note">Simulation controls. On a real fibre nobody can switch an attacker on or off.</p>
+  </header>
+
+  <div class="layout">
+    <section class="controls" aria-label="Link conditions">
+      <h2>Conditions</h2>
+
+      <div class="presets" role="group" aria-label="Presets">
+        <button type="button" class="chipbtn" data-preset="clean">Quiet fibre</button>
+        <button type="button" class="chipbtn" data-preset="noisy">Noisy fibre</button>
+        <button type="button" class="chipbtn" data-preset="eve">Eve listening</button>
+        <button type="button" class="chipbtn" data-preset="tamper">Altered messages</button>
+      </div>
+
+      <div class="control">
+        <div class="switch-row">
+          <label for="eve">Eavesdropper on the fibre</label>
+          <input type="checkbox" id="eve" role="switch">
+        </div>
+        <p class="help">Eve measures each qubit she intercepts and sends a new one on. That disturbs the qubit, and Alice and Bob see it as extra errors.</p>
+        <div class="slider"><label for="eve_rate">Share of qubits intercepted <output id="eve_rate_o"></output></label><input type="range" id="eve_rate" min="0" max="100" step="5"></div>
+        <div class="slider"><label for="eve_start">Eve starts partway through <output id="eve_start_o"></output></label><input type="range" id="eve_start" min="0" max="95" step="5"></div>
+      </div>
+
+      <div class="control">
+        <div class="slider"><label for="noise">Fibre noise <output id="noise_o"></output></label><input type="range" id="noise" min="0" max="20" step="0.5"></div>
+        <p class="help">Ordinary errors that nobody caused. Below about 11% the keys can still be made; above it the protocol stops.</p>
+      </div>
+
+      <div class="control">
+        <div class="switch-row">
+          <label for="tamper">Alter public messages</label>
+          <input type="checkbox" id="tamper" role="switch">
+        </div>
+        <p class="help">Rewrites one value in each protocol message in flight. Every message is signed, so the receiver should refuse them.</p>
+      </div>
+
+      <h2>Totals</h2>
+      <dl class="stats" id="stats"></dl>
+    </section>
+
+    <section class="wire" aria-label="Wire log">
+      <div class="wire-head">
+        <h2>What Eve can see, newest first</h2>
+        <div class="wire-tools">
+          <label class="check"><input type="checkbox" id="showec"> Show every error-correction message</label>
+          <label class="check"><input type="checkbox" id="pause"> Pause the log</label>
+          <button type="button" class="chipbtn" id="clear">Clear log</button>
+        </div>
+      </div>
+      <p class="help" id="wire-help">Protocol messages are public by design: readable, but signed. Record contents travel as ciphertext.</p>
+      <ol id="log" class="log" aria-live="off"></ol>
+      <p class="empty" id="empty">Nothing on the wire yet. Send a record from Hospital A and it appears here.</p>
+    </section>
+  </div>
+  <script src="/portal/eve.js"></script>
+</body>
+</html>

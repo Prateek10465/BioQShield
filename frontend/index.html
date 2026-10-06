@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantum-secured patient records</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1>Quantum-secured patient records</h1>
+      <p class="lede">Alice sends a patient record to Bob. Their encryption key is made from qubits, so anyone who listens in leaves a trace. Switch Eve on and run a session to see it.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="stage" id="stage" data-state="idle" aria-label="Quantum link between Alice and Bob">
+      <p class="stage-status" id="stageStatus" role="status" aria-live="polite">Ready. Press Run session.</p>
+      <p class="stage-sub" id="stageSub">Each session sends thousands of qubits from Alice to Bob, then turns what they share into an AES-256 key.</p>
+
+      <svg class="link" viewBox="0 56 900 214" role="img" aria-label="Alice on the left, Bob on the right, Eve tapping the line between them">
+        <line class="wire" x1="130" y1="120" x2="770" y2="120"></line>
+        <g id="photons"></g>
+
+        <g class="node">
+          <circle cx="70" cy="120" r="48"></circle>
+          <text x="70" y="132" text-anchor="middle" class="glyph">A</text>
+          <text x="70" y="206" text-anchor="middle" class="name">Alice</text>
+          <text x="70" y="238" text-anchor="middle" class="role">Sends</text>
+        </g>
+        <g class="node">
+          <circle cx="830" cy="120" r="48"></circle>
+          <text x="830" y="132" text-anchor="middle" class="glyph">B</text>
+          <text x="830" y="206" text-anchor="middle" class="name">Bob</text>
+          <text x="830" y="238" text-anchor="middle" class="role">Receives</text>
+        </g>
+        <g class="eve eve-off" id="eveNode">
+          <line class="tap" x1="450" y1="120" x2="450" y2="188"></line>
+          <circle cx="450" cy="222" r="34"></circle>
+          <text x="450" y="233" text-anchor="middle" class="glyph">E</text>
+          <text x="510" y="216" class="name" id="eveName">Eve is off</text>
+          <text x="510" y="244" class="role" id="eveRole">Not listening</text>
+        </g>
+      </svg>
+    </section>
+
+    <form class="controls" id="controls" autocomplete="off">
+      <div class="presets" role="group" aria-label="Scenarios">
+        <button type="button" class="chip" data-preset="clean" aria-pressed="false">Clean link</button>
+        <button type="button" class="chip" data-preset="noisy" aria-pressed="false">Noisy link</button>
+        <button type="button" class="chip" data-preset="attack" aria-pressed="false">Eve listening</button>
+      </div>
+
+      <div class="fields">
+        <label class="field">
+          <span class="label">Qubits sent</span>
+          <select id="qubits">
+            <option value="2048">2,048</option>
+            <option value="4096">4,096</option>
+            <option value="8192" selected>8,192</option>
+            <option value="16384">16,384</option>
+            <option value="32768">32,768</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="label">Channel noise <output id="noiseOut">2%</output></span>
+          <input type="range" id="noise" min="0" max="10" step="0.5" value="2">
+        </label>
+
+        <div class="field">
+          <label class="check"><input type="checkbox" id="eve"> <span class="label">Eve intercepts qubits</span></label>
+          <label class="sub" for="eveRate">Share she intercepts <output id="eveRateOut">100%</output></label>
+          <input type="range" id="eveRate" min="10" max="100" step="10" value="100">
+          <label class="check small"><input type="checkbox" id="eveMid"> <span>She joins halfway through</span></label>
+        </div>
+
+        <div class="run">
+          <button type="submit" class="primary" id="runBtn">Run session</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="grid">
+      <section class="panel" aria-labelledby="sessionH">
+        <h2 id="sessionH">Session</h2>
+        <ol class="steps" id="steps">
+          <li class="empty">Steps appear here as the session runs.</li>
+        </ol>
+        <p class="verdict" id="verdict" hidden></p>
+        <p class="ground" id="ground" hidden></p>
+      </section>
+
+      <div class="stack">
+        <section class="panel" aria-labelledby="chartH">
+          <h2 id="chartH">Error rate across the stream</h2>
+          <svg id="chart" viewBox="0 0 560 240" role="img" aria-label="Error rate per segment of the qubit stream"></svg>
+          <p class="note" id="chartNote">Alice and Bob reveal a random quarter of their matching bits and count the disagreements. Noise gives a low, even rate. An eavesdropper pushes it toward 25%.</p>
+        </section>
+
+        <section class="panel" aria-labelledby="recordH">
+          <h2 id="recordH">The record</h2>
+          <div class="rec">
+            <h3>Alice has</h3>
+            <pre id="recAlice" class="blank">Run a session to prepare the record.</pre>
+          </div>
+          <div class="rec">
+            <h3>On the wire, what Eve sees</h3>
+            <pre id="recWire" class="blank mono wrap">Nothing yet.</pre>
+          </div>
+          <div class="rec">
+            <h3>Bob gets</h3>
+            <pre id="recBob" class="blank">Nothing yet.</pre>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <details class="panel qiskit" id="qiskit">
+      <summary>Run it on real quantum circuits (Qiskit)</summary>
+      <p class="note">The dashboard above simulates thousands of qubits with fast statistics. This runs the same protocol as actual circuits on Qiskit's Aer simulator, one circuit per qubit, using the noise and Eve settings above.</p>
+      <div class="qk-actions">
+        <button type="button" class="chip" id="qkBtn">Run 12 qubits through Qiskit</button>
+        <span class="note" id="qkStatus" role="status" aria-live="polite"></span>
+      </div>
+      <div id="qkOut" hidden>
+        <p class="note" id="qkSummary"></p>
+        <h3 class="qk-h">Circuit for qubit 0</h3>
+        <pre id="qkCircuit" class="mono"></pre>
+        <div class="table-wrap">
+          <table id="qkTable">
+            <thead>
+              <tr><th scope="col">Qubit</th><th scope="col">Alice</th><th scope="col">Eve</th><th scope="col">Bob</th><th scope="col">Outcome</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <footer class="foot">
+      <p>This is a software simulation of BB84, not quantum hardware. The patient record is synthetic. The final key length uses a simplified finite-key bound, so treat it as a teaching model, not a certified implementation.</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+session,phase,noise,eve_rate,threat,qber,key_bits,accept_limit,baseline,z,action,why
+1,commissioned link,0.02,0.0,0.04925938078127194,0.02594810379241517,642,0.05294031949701218,0.023902843392676305,0.31743063680598144,ACCEPT,"QBER 2.6% within 5.3%, key 642 bits"
+2,commissioned link,0.02,0.0,0.04925938078127194,0.01968503937007874,777,0.05316395268095722,0.023512511475203286,-0.5934198234997583,ACCEPT,"QBER 2.0% within 5.3%, key 777 bits"
+3,commissioned link,0.02,0.0,0.04925938078127194,0.011857707509881422,951,0.05277362076348421,0.022510501751702123,-1.6555807346504363,ACCEPT,"QBER 1.2% within 5.3%, key 951 bits"
+4,commissioned link,0.02,0.0,0.04925938078127194,0.023076923076923078,730,0.05177161103998304,0.022557344755519074,0.08346565420613136,ACCEPT,"QBER 2.3% within 5.2%, key 730 bits"
+5,commissioned link,0.02,0.0,0.04925938078127194,0.02127659574468085,762,0.05181845404379999,0.02245820662061273,-0.18852169059695184,ACCEPT,"QBER 2.1% within 5.2%, key 762 bits"
+6,commissioned link,0.02,0.0,0.04925938078127194,0.025896414342629483,645,0.05171931590889365,0.022703114895537998,0.5014089804176018,ACCEPT,"QBER 2.6% within 5.2%, key 645 bits"
+7,commissioned link,0.02,0.0,0.04925938078127194,0.021825396825396824,727,0.05196422418381892,0.022643419935648466,-0.12779538340722832,ACCEPT,"QBER 2.2% within 5.2%, key 727 bits"
+8,commissioned link,0.02,0.0,0.04925938078127194,0.014141414141414142,873,0.05190452922392939,0.022100899384989485,-1.231077976006622,ACCEPT,"QBER 1.4% within 5.2%, key 873 bits"
+9,"Eve joins (15%)
+traffic quiet",0.02,0.15,0.04925938078127194,0.06407766990291262,70,0.051362008673270405,0.022100899384989485,6.274841937142511,MONITOR,QBER 6.4% above accept limit 5.1%: noise or a partial eavesdropper; QBER 6.3 sigma above this link's baseline 2.2%; only 70 secret bits left (need 256): no usable key from this session
+10,"Eve joins (15%)
+traffic quiet",0.02,0.15,0.04925938078127194,0.05758157389635317,160,0.051362008673270405,0.022100899384989485,5.33265440861558,MONITOR,QBER 5.8% above accept limit 5.1%: noise or a partial eavesdropper; QBER 5.3 sigma above this link's baseline 2.2%; only 160 secret bits left (need 256): no usable key from this session
+11,"Eve joins (15%)
+traffic quiet",0.02,0.15,0.04925938078127194,0.06782945736434108,21,0.051362008673270405,0.022100899384989485,6.84189274319489,REJECT,QBER 6.8% above accept limit 5.1%: noise or a partial eavesdropper; QBER 6.8 sigma above this link's baseline 2.2%; only 21 secret bits left (need 256): no usable key from this session; 3 Monitor results in a row: escalated
+12,"Eve joins (15%)
+traffic quiet",0.02,0.15,0.04925938078127194,0.05791505791505792,154,0.051362008673270405,0.022100899384989485,5.368229185208861,REJECT,QBER 5.8% above accept limit 5.1%: noise or a partial eavesdropper; QBER 5.4 sigma above this link's baseline 2.2%; only 154 secret bits left (need 256): no usable key from this session; 4 Monitor results in a row: escalated
+13,"Eve + attack
+traffic",0.02,0.15,0.9488168122992701,0.05791505791505792,154,0.037868647200500434,0.022100899384989485,5.368229185208861,REJECT,QBER 5.8% above accept limit 3.8% while network threat is high (0.95); QBER 5.4 sigma above this link's baseline 2.2%; only 154 secret bits left (need 256): no usable key from this session
+14,"Eve + attack
+traffic",0.02,0.15,0.9488168122992701,0.05410821643286573,193,0.037868647200500434,0.022100899384989485,4.714222789984286,REJECT,QBER 5.4% above accept limit 3.8% while network threat is high (0.95); QBER 4.7 sigma above this link's baseline 2.2%; only 193 secret bits left (need 256): no usable key from this session
+15,"Eve + attack
+traffic",0.02,0.15,0.9488168122992701,0.056795131845841784,152,0.037868647200500434,0.022100899384989485,5.080999642470377,REJECT,QBER 5.7% above accept limit 3.8% while network threat is high (0.95); QBER 5.1 sigma above this link's baseline 2.2%; only 152 secret bits left (need 256): no usable key from this session
+16,"Eve + attack
+traffic",0.02,0.15,0.9488168122992701,0.05731225296442688,155,0.037868647200500434,0.022100899384989485,5.220168355062874,REJECT,QBER 5.7% above accept limit 3.8% while network threat is high (0.95); QBER 5.2 sigma above this link's baseline 2.2%; only 155 secret bits left (need 256): no usable key from this session
+17,Eve gone,0.02,0.0,0.04925938078127194,0.02004008016032064,753,0.051362008673270405,0.02197396077775769,-0.30352937549997605,ACCEPT,"QBER 2.0% within 5.1%, key 753 bits"
+18,Eve gone,0.02,0.0,0.04925938078127194,0.023952095808383235,680,0.05123507006603861,0.022091381471084075,0.2930996148861464,ACCEPT,"QBER 2.4% within 5.1%, key 680 bits"
+19,Eve gone,0.02,0.0,0.04925938078127194,0.017509727626459144,837,0.051352490759364995,0.021823324224715997,-0.6861295537104598,ACCEPT,"QBER 1.8% within 5.1%, key 837 bits"
+20,Eve gone,0.02,0.0,0.04925938078127194,0.023391812865497075,711,0.05108443351299692,0.02191152638478459,0.23634559472156616,ACCEPT,"QBER 2.3% within 5.1%, key 711 bits"
+21,Eve gone,0.02,0.0,0.04925938078127194,0.02835538752362949,643,0.051172635673065514,0.022271516106529648,0.984256532551419,ACCEPT,"QBER 2.8% within 5.1%, key 643 bits"

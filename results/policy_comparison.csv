@@ -1,0 +1,9 @@
+scenario,eve,noise,eve_rate,static_flagged,adaptive_flagged,static_rejected,adaptive_rejected
+normal (2% noise),False,0.02,0.0,0.0,0.0,0.0,0.0
+benign drift to 3%,False,0.03,0.0,0.0,0.05,0.0,0.0
+benign drift to 4%,False,0.04,0.0,0.05,0.5375,0.0,0.0
+Eve on 5% of photons,True,0.02,0.05,0.0,0.125,0.0,0.0
+Eve on 10%,True,0.02,0.1,0.1625,0.7375,0.0,0.0
+Eve on 20%,True,0.02,0.2,1.0,1.0,0.0,0.95
+Eve on 50%,True,0.02,0.5,1.0,1.0,1.0,1.0
+Eve on 100%,True,0.02,1.0,1.0,1.0,1.0,1.0

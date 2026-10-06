@@ -1,0 +1,31 @@
+{
+  "data_source": "SYNTHETIC STAND-IN (not NSL-KDD)",
+  "classifier": {
+    "model": "rf",
+    "n": 4000,
+    "accuracy": 0.97575,
+    "precision": 0.9682966147232671,
+    "recall": 0.9793478260869565,
+    "f1": 0.9737908673331532,
+    "roc_auc": 0.996989231078905,
+    "confusion": {
+      "tn": 2101,
+      "fp": 59,
+      "fn": 38,
+      "tp": 1802
+    },
+    "recall_by_category": {
+      "DoS": 1.0,
+      "Probe": 0.9956521739130435,
+      "R2L": 0.9356060606060606,
+      "U2R": 0.9931740614334471
+    }
+  },
+  "threat_scores": {
+    "normal traffic": 0.04925938078127194,
+    "mixed (20% attack)": 0.22328053541271925,
+    "attack traffic": 0.9488168122992701
+  },
+  "engine": "numpy",
+  "qubits": 4096
+}

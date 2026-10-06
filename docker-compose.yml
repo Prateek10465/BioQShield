@@ -1,0 +1,75 @@
+# MediQKD: link service + Hospital A (sends) + Hospital B (receives).
+#
+#   python scripts/make_env.py        # writes .env with fresh random secrets (once)
+#   docker compose up --build
+#
+# Hospital A  http://localhost:8001     Hospital B  http://localhost:8002
+# Link console (switch Eve on and off)  http://localhost:8003
+#
+# Every published port is bound to 127.0.0.1. The link console has no login on purpose (it is
+# the simulated fibre and the attacker's switchboard), so do not publish it beyond localhost.
+
+x-node: &node
+  build: .
+  image: mediqkd:latest
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+
+services:
+  link:
+    <<: *node
+    command: ["python", "-m", "uvicorn", "nodes.channel:app", "--host", "0.0.0.0", "--port", "8003"]
+    environment:
+      PORT: "8003"
+      QKD_BOB_URL: http://bob:8002
+      QKD_AUTH_KEY: ${QKD_AUTH_KEY:?run python scripts/make_env.py first}
+    ports: ["127.0.0.1:8003:8003"]
+
+  bob:
+    <<: *node
+    command: ["python", "-m", "uvicorn", "nodes.bob:create_app", "--factory", "--host", "0.0.0.0", "--port", "8002"]
+    environment:
+      PORT: "8002"
+      QKD_HOSPITAL_NAME: ${HOSPITAL_B_NAME:-Hospital B}
+      QKD_PEER_NAME: ${HOSPITAL_A_NAME:-Hospital A}
+      QKD_CHANNEL_URL: http://link:8003
+      QKD_AUTH_KEY: ${QKD_AUTH_KEY:?run python scripts/make_env.py first}
+      QKD_MASTER_KEY: ${QKD_MASTER_KEY_B:?run python scripts/make_env.py first}
+      QKD_ADMIN_PASSWORD: ${ADMIN_PASSWORD_B:?run python scripts/make_env.py first}
+      QKD_KEY_TTL: ${QKD_KEY_TTL:-3600}
+      QKD_DEMO_USERS: ${DEMO_USERS:-}
+      QKD_CLINICIAN_PASSWORD: ${CLINICIAN_PASSWORD:-}
+      QKD_AUDITOR_PASSWORD: ${AUDITOR_PASSWORD:-}
+    volumes: ["bob-data:/data"]
+    ports: ["127.0.0.1:8002:8002"]
+    depends_on:
+      link: {condition: service_healthy}
+
+  alice:
+    <<: *node
+    command: ["python", "-m", "uvicorn", "nodes.alice:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      PORT: "8001"
+      QKD_HOSPITAL_NAME: ${HOSPITAL_A_NAME:-Hospital A}
+      QKD_PEER_NAME: ${HOSPITAL_B_NAME:-Hospital B}
+      QKD_CHANNEL_URL: http://link:8003
+      QKD_AUTH_KEY: ${QKD_AUTH_KEY:?run python scripts/make_env.py first}
+      QKD_MASTER_KEY: ${QKD_MASTER_KEY_A:?run python scripts/make_env.py first}
+      QKD_ADMIN_PASSWORD: ${ADMIN_PASSWORD_A:?run python scripts/make_env.py first}
+      QKD_KEY_TTL: ${QKD_KEY_TTL:-3600}
+      QKD_QUBITS: ${QKD_QUBITS:-16384}
+      QKD_DEMO_USERS: ${DEMO_USERS:-}
+      QKD_CLINICIAN_PASSWORD: ${CLINICIAN_PASSWORD:-}
+      QKD_AUDITOR_PASSWORD: ${AUDITOR_PASSWORD:-}
+    volumes: ["alice-data:/data"]
+    ports: ["127.0.0.1:8001:8001"]
+    depends_on:
+      link: {condition: service_healthy}
+      bob: {condition: service_healthy}
+
+volumes:
+  alice-data:
+  bob-data:

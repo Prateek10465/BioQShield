@@ -1,0 +1,13 @@
+quantum,engine,traffic,threat,qber,key_bits,action,why
+clean fibre,qiskit,normal traffic,0.049259380781271934,0.029354207436399216,595,ACCEPT,"QBER 2.9% within 4.9%, key 595 bits"
+clean fibre,qiskit,mixed (20% attack),0.22328053541271925,0.029354207436399216,595,ACCEPT,"QBER 2.9% within 4.6%, key 595 bits"
+clean fibre,qiskit,attack traffic,0.9488168122992701,0.029354207436399216,595,MONITOR,QBER is clean but network threat is high (0.95): classical side may be under attack
+noisy fibre (4%),qiskit,normal traffic,0.049259380781271934,0.0273972602739726,632,ACCEPT,"QBER 2.7% within 4.9%, key 632 bits"
+noisy fibre (4%),qiskit,mixed (20% attack),0.22328053541271925,0.0273972602739726,632,ACCEPT,"QBER 2.7% within 4.6%, key 632 bits"
+noisy fibre (4%),qiskit,attack traffic,0.9488168122992701,0.0273972602739726,632,MONITOR,QBER is clean but network threat is high (0.95): classical side may be under attack
+partial Eve (10%),qiskit,normal traffic,0.049259380781271934,0.03501945525291829,501,ACCEPT,"QBER 3.5% within 4.9%, key 501 bits"
+partial Eve (10%),qiskit,mixed (20% attack),0.22328053541271925,0.03501945525291829,501,ACCEPT,"QBER 3.5% within 4.6%, key 501 bits"
+partial Eve (10%),qiskit,attack traffic,0.9488168122992701,0.03501945525291829,501,MONITOR,QBER is clean but network threat is high (0.95): classical side may be under attack
+full Eve,qiskit,normal traffic,0.049259380781271934,0.232,0,REJECT,QBER 23.2% above the 11% limit: no secret key can be trusted
+full Eve,qiskit,mixed (20% attack),0.22328053541271925,0.232,0,REJECT,QBER 23.2% above the 11% limit: no secret key can be trusted
+full Eve,qiskit,attack traffic,0.9488168122992701,0.232,0,REJECT,QBER 23.2% above the 11% limit: no secret key can be trusted
