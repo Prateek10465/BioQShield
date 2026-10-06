@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 from .store import Store
 
-ROLES = ("clinician", "auditor", "admin")
+ROLES = ("clinician", "auditor", "admin", "doctor", "worker")
 TOKEN_TTL = 8 * 3600
 MIN_PASSWORD = 10
 THROTTLE_FAILS = 5
@@ -70,6 +70,7 @@ class Accounts:
 
     # ---- users ---------------------------------------------------------------
     def create_user(self, username: str, password: str, role: str, enforce_policy: bool = True) -> bool:
+        role = (role or "").strip().lower()
         if role not in ROLES:
             raise ValueError(f"role must be one of {', '.join(ROLES)}")
         if enforce_policy and len(password) < MIN_PASSWORD:

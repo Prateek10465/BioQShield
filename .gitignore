@@ -10,3 +10,5 @@ FrontendV2/.next/
 FrontendV2/out/
 FrontendV2/tsconfig.tsbuildinfo
 FrontendV2/.pytest_cache/
+package.json
+skills/

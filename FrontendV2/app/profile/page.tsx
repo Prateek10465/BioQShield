@@ -3,40 +3,36 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppShell } from '@/components/bioqshield'
-import { Building2, CheckCircle2, ChevronRight, LogOut, ShieldCheck, UserRound, X } from 'lucide-react'
-import { getAuthUser, logoutUser, setAuthUser, AuthUser, HOSPITALS } from '@/lib/api'
-
-const AVAILABLE_USERS = HOSPITALS.flatMap((h) =>
-  h.users.map((u) => ({
-    name: u.name,
-    username: u.username,
-    role: u.role,
-    department: u.department,
-    hospital: h.name,
-    hospitalId: h.id,
-    branch: h.branch,
-    nodeId: h.nodeId,
-    orgId: h.nodeId,
-    initials: u.initials,
-  }))
-)
+import { Building2, CheckCircle2, ChevronRight, LogOut, ShieldAlert, ShieldCheck, UserRound, Users, X } from 'lucide-react'
+import { getAuthUser, logoutUser, setAuthUser, isSystemAdmin, getHospitalUsers, AuthUser, HOSPITALS, HospitalUser } from '@/lib/api'
 
 export default function ProfilePage() {
   const router = useRouter()
   const [currentUser, setCurrentUser] = useState(getAuthUser())
+  const [availableUsers, setAvailableUsers] = useState<HospitalUser[]>([])
   const [switchOpen, setSwitchOpen] = useState(false)
   const [logoutOpen, setLogoutOpen] = useState(false)
 
   useEffect(() => {
     setCurrentUser(getAuthUser())
+    setAvailableUsers(getHospitalUsers())
   }, [])
 
-  const handleSelectUser = (u: (typeof AVAILABLE_USERS)[0]) => {
-    setAuthUser({
-      ...u,
+  const handleSelectUser = (u: HospitalUser) => {
+    const authData: AuthUser = {
+      name: u.name,
+      username: u.username,
+      role: u.role,
+      department: u.department,
+      hospital: u.hospitalName,
+      hospitalId: u.hospitalId,
+      branch: u.branch,
+      nodeId: u.hospitalId === 'hospital-1' ? 'AQ-CHN-01' : 'FT-CHN-02',
+      initials: u.initials,
       isLoggedIn: true,
-    })
-    setCurrentUser({ ...u, isLoggedIn: true } as AuthUser)
+    }
+    setAuthUser(authData)
+    setCurrentUser(authData)
     setSwitchOpen(false)
   }
 
@@ -102,6 +98,31 @@ export default function ProfilePage() {
             </button>
           </div>
         </section>
+
+        {isSystemAdmin(currentUser) && (
+          <div className="mt-5 rounded-2xl border border-[#8B5CF6]/30 bg-gradient-to-r from-[#1E113E] to-[#0E1F3B] p-6 text-white shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#C4B5FD]">
+                  <ShieldAlert className="size-4" />
+                  System Administrator Privileges Active
+                </div>
+                <h3 className="mt-1 text-[18px] font-bold text-white">
+                  Hospital Network Governance Console
+                </h3>
+                <p className="mt-1 text-[13px] text-[#CBD5E1]">
+                  You have full authority to add or remove workers & doctors, rotate quantum keys, and inspect audit logs.
+                </p>
+              </div>
+              <button
+                onClick={() => router.push('/admin/')}
+                className="flex items-center gap-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] px-5 py-2.5 text-[13px] font-bold text-white transition shadow-sm cursor-pointer shrink-0"
+              >
+                <Users className="size-4" /> Open Admin Console
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-5">
           <section className="rounded-2xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] p-6 shadow-[0_3px_12px_rgba(18,52,91,0.035)]">
@@ -184,8 +205,8 @@ export default function ProfilePage() {
           subtitle="Select an authorized healthcare professional."
           onClose={() => setSwitchOpen(false)}
         >
-          <div className="flex flex-col gap-2">
-            {AVAILABLE_USERS.map((u) => {
+          <div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-1">
+            {availableUsers.map((u) => {
               const selected = u.username === currentUser.username
               return (
                 <button

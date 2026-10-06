@@ -126,6 +126,7 @@ KNOWN_PAGES = [
     "about",
     "login",
     "profile",
+    "admin",
 ]
 
 for page in KNOWN_PAGES:

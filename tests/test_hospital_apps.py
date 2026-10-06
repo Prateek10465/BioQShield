@@ -135,6 +135,19 @@ def test_admin_creates_and_disables_users(alice):
     assert alice.http.get("/api/records", headers=token).status_code == 200
     assert alice.http.post("/api/users/new.doc/disable", headers=adm).status_code == 200
     assert alice.http.get("/api/records", headers=token).status_code == 401  # signed out immediately
+    assert alice.http.post("/api/users/new.doc/enable", headers=adm).status_code == 200
+    login2 = alice.http.post("/api/auth/login", json={"username": "new.doc", "password": "a-long-enough-pass"})
+    assert login2.status_code == 200
+    # delete user
+    assert alice.http.delete("/api/users/admin", headers=adm).status_code == 400  # cannot delete self
+    assert alice.http.delete("/api/users/new.doc", headers=adm).status_code == 200
+    assert alice.http.post("/api/auth/login", json={"username": "new.doc", "password": "a-long-enough-pass"}).status_code == 401
+    # add doctor and worker
+    assert alice.http.post("/api/users", headers=adm, json={"username": "dr.smith", "password": "doctor-strong-pass", "role": "doctor"}).status_code == 201
+    assert alice.http.post("/api/users", headers=adm, json={"username": "nurse.jane", "password": "worker-strong-pass", "role": "worker"}).status_code == 201
+    # admin network endpoints
+    assert alice.http.get("/api/admin/network/overview", headers=adm).status_code == 200
+    assert alice.http.post("/api/admin/network/rotate-keys", headers=adm).status_code == 200
     assert alice.http.post("/api/users/admin/disable", headers=adm).status_code == 400  # not yourself
 
 

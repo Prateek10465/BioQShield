@@ -252,6 +252,39 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
         audit.record(user.username, "user_disabled", username=username)
         return {"ok": True}
 
+    @app.post("/api/users/{username}/enable")
+    def enable_user(username: str, user: User = Depends(require("admin"))) -> dict:
+        if not store.set_user_disabled(username, False):
+            raise HTTPException(404, "no such user")
+        audit.record(user.username, "user_enabled", username=username)
+        return {"ok": True}
+
+    @app.delete("/api/users/{username}")
+    def delete_user(username: str, user: User = Depends(require("admin"))) -> dict:
+        if username == user.username:
+            raise HTTPException(400, "you cannot delete your own account")
+        if not store.delete_user(username):
+            raise HTTPException(404, "no such user")
+        audit.record(user.username, "user_deleted", username=username)
+        return {"ok": True}
+
+    # ---- network & node administration (admin) ---------------------------------------
+    @app.get("/api/admin/network/overview")
+    def admin_network_overview(user: User = Depends(require("admin"))) -> dict:
+        return {
+            "node": {"name": cfg.name, "role": cfg.role, "key_source": cfg.key_source},
+            "users": store.list_users(),
+            "pool": store.pool_stats(ctx.now()),
+            "audit_verification": audit.verify(),
+            "link": link_probe(),
+        }
+
+    @app.post("/api/admin/network/rotate-keys")
+    def admin_rotate_keys(user: User = Depends(require("admin"))) -> dict:
+        expired = store.expire_keys()
+        audit.record(user.username, "keys_rotated", count=len(expired))
+        return {"ok": True, "expired_count": len(expired), "message": f"Successfully rotated and zeroised {len(expired)} quantum keys across network."}
+
     # ---- audit (auditor, admin) -------------------------------------------------------
     @app.get("/api/audit")
     def audit_entries(limit: int = 100, before: int | None = None,
@@ -371,6 +404,7 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
         "transfer-history",
         "about",
         "profile",
+        "admin",
     ]
 
     @app.get("/", include_in_schema=False)

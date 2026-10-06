@@ -61,7 +61,7 @@ def create_app(cfg: Config | None = None, *, kme_http=None, link=None, now=time.
     app = FastAPI(title=f"{cfg.name} (receiver)", version="1.0.0",
                   lifespan=make_lifespan(ctx, lambda: expire_and_log(ctx)))
     _, require = install(app, ctx, probe)
-    clinician = require("clinician")
+    clinician = require("clinician", "doctor", "worker")
 
     # ---- the QKD dialogue (called by Alice, relayed through the link) -----------------------
     @app.post("/proto/{kind}")

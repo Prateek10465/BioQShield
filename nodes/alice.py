@@ -76,7 +76,7 @@ def create_app(cfg: Config | None = None, *, kme_http=None, now=time.time) -> Fa
     km = KeyManager(store, source, audit, cfg, now)
     app = FastAPI(title=f"{cfg.name} (sender)", version="1.0.0", lifespan=make_lifespan(ctx, km.maintain))
     _, require = install(app, ctx, probe)
-    clinician = require("clinician")
+    clinician = require("clinician", "doctor", "worker")
 
     # ---- records -----------------------------------------------------------------------
     @app.post("/api/records", status_code=201)

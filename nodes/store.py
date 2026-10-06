@@ -273,6 +273,17 @@ class Store:
                 c.execute("DELETE FROM tokens WHERE username=?", (username,))
             return cur.rowcount == 1
 
+    def delete_user(self, username: str) -> bool:
+        with self._c() as c:
+            cur = c.execute("DELETE FROM users WHERE username=?", (username,))
+            c.execute("DELETE FROM tokens WHERE username=?", (username,))
+            return cur.rowcount == 1
+
+    def update_user_role(self, username: str, role: str) -> bool:
+        with self._c() as c:
+            cur = c.execute("UPDATE users SET role=? WHERE username=?", (role, username))
+            return cur.rowcount == 1
+
     def save_token(self, token_hash: str, username: str, expires: float) -> None:
         with self._c() as c:
             c.execute("INSERT INTO tokens (token_hash, username, expires) VALUES (?,?,?)",
