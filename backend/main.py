@@ -17,7 +17,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -104,15 +104,15 @@ def qiskit_demo(req: QiskitRequest) -> dict:
 
 FRONTEND = ROOT / "frontend"
 
-# Fallback routes for specific frontend HTML views
-@app.get("/classic", response_class=HTMLResponse)
-@app.get("/lab", response_class=HTMLResponse)
-def classic_lab():
-    legacy_file = FRONTEND / "index_classic.html"
-    if legacy_file.exists():
-        return FileResponse(legacy_file)
-    return FileResponse(FRONTEND / "index.html")
 
+@app.get("/app.js")
+def app_js() -> PlainTextResponse:
+    return PlainTextResponse("// Legacy hospital UI removed; use the FrontendV2 build.\n")
+
+
+@app.get("/style.css")
+def style_css() -> PlainTextResponse:
+    return PlainTextResponse("/* Legacy hospital UI removed; use the FrontendV2 build. */\n")
 
 # Helper route for clean subpath URLs without trailing slashes
 KNOWN_PAGES = [

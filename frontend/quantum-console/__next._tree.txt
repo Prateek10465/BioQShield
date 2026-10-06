@@ -1,3 +1,2 @@
 :HL["/_next/static/chunks/38gkdj76dcq1i.css","style"]
-:HL["/portal/hospital.js","script"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"quantum-console","param":null,"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"2Iw4CUhFl5Jn2HPafra89"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"quantum-console","param":null,"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"dES7I5q0xmiYbybhRDHaf"}

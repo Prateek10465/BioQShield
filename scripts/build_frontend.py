@@ -21,22 +21,28 @@ def main():
     env = os.environ.copy()
     env["NEXT_EXPORT"] = "true"
 
-    cmd = ["pnpm", "run", "build"]
-    # Check if pnpm is installed or fallback to npx/npm
-    try:
-        res = subprocess.run(cmd, cwd=FRONTEND_V2, env=env, check=True)
-    except FileNotFoundError:
-        cmd = ["npx", "next", "build"]
-        res = subprocess.run(cmd, cwd=FRONTEND_V2, env=env, check=True)
+    pnpm = shutil.which("pnpm")
+    npx = shutil.which("npx")
+    if pnpm:
+        cmd = [pnpm, "run", "build"]
+    elif npx:
+        cmd = [npx, "next", "build"]
+    elif (FRONTEND / "index.html").exists():
+        print("Node tooling not found; using the committed static FrontendV2 build.")
+        return
+    else:
+        raise RuntimeError(
+            "Node tooling not found and no committed static frontend is available. "
+            "Install Node.js and pnpm, then run this command again."
+        )
+
+    subprocess.run(cmd, cwd=FRONTEND_V2, env=env, check=True)
 
     if not OUT.exists():
         print(f"Error: {OUT} was not generated.")
         sys.exit(1)
 
     print(f"Syncing static build from {OUT} to {FRONTEND}...")
-    # Preserve key files if they exist
-    preserved = ["portal", "index_classic.html", "app.js", "style.css"]
-
     for item in OUT.iterdir():
         dest = FRONTEND / item.name
         if item.is_dir():

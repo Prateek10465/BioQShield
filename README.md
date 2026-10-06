@@ -24,25 +24,62 @@ If an eavesdropper is detected, **no key is made and nothing is sent**.
 
 ## Run it
 
-Needs Python 3.11+.
+### Quick start for judges and teammates
+
+The normal run needs Python 3.11 or newer. Node.js is **not required** because the repository
+already contains the exported FrontendV2 build.
+
+From the repository root:
 
 ```bash
-pip install -r requirements-node.txt
-python scripts/run_all.py --fresh          # link + Hospital A + Hospital B
+# Create and activate a virtual environment (recommended)
+python3 -m venv .venv
+source .venv/bin/activate             # Windows PowerShell: .\.venv\Scripts\Activate.ps1
+
+# Install the hospital, quantum, and threat-analysis dependencies
+python -m pip install -r requirements-node.txt
+
+# Start the link, Hospital B, and Hospital A with fresh local demo data
+python scripts/run_all.py --fresh
 ```
 
-| What | URL |
-|---|---|
-| Hospital Command Centre (Login & Choose Hospital) | http://localhost:8001 |
-| Link console: switch Eve, noise and message tampering on and off | http://localhost:8003 |
+Open these URLs after the startup message appears:
 
-The script prints demo logins for local use: `dr.rao` (clinician), `auditor`, `admin`.
-Add `--etsi` to take keys from a stub ETSI key manager instead of simulated BB84.
+| Service | URL | Purpose |
+|---|---|---|
+| Hospital Command Centre | http://localhost:8001 | V2 hospital UI, login, secure transfers, dashboards, and audit workflows |
+| Link console | http://localhost:8003 | Eve, noise, tampering, and public-wire simulation controls |
+
+The runner builds FrontendV2 automatically when `pnpm` or `npx` is installed. On laptops without
+Node.js, it uses the committed static V2 build and starts the hospital services normally.
+
+The startup output prints the local demo accounts. The main examples use `dr.rao`; `auditor` and
+`admin` are also available for audit and administration workflows. Use `Ctrl+C` to stop all services.
+
+To use the ETSI GS QKD 014 stub KME instead of the simulated BB84 key source:
+
+```bash
+python scripts/run_all.py --fresh --etsi
+```
+
+### Frontend development (optional)
+
+Only use this when editing the React/Next.js source in `FrontendV2`:
+
+```bash
+cd FrontendV2
+pnpm install
+pnpm dev
+```
+
+Open http://localhost:3000. The development proxy targets the hospital API on port `8001`.
+Set `BIOQSHIELD_API_URL` if the API is running on another port.
 
 ### With Docker
 
 ```bash
-python scripts/make_env.py --demo     # writes .env with fresh random secrets and prints the logins
+# Requires Docker Desktop or Docker Engine with Compose
+python scripts/make_env.py --demo     # writes .env with fresh secrets and demo logins
 docker compose up --build
 docker compose -f docker-compose.yml -f docker-compose.etsi.yml up --build   # ETSI mode
 ```
@@ -76,7 +113,8 @@ Run the build once before relying on it.
 | Encrypted storage | `nodes/vault.py`, `nodes/store.py` | AES-GCM per row, bound to row identity |
 | Logins and roles | `nodes/accounts.py` | scrypt, hashed session tokens, throttling, clinician / auditor / admin |
 | Tamper-evident audit log | `nodes/audit.py` | HMAC hash chain plus signed head; detects edits, deletes, truncation |
-| Web apps | `frontend/portal/` | one script for both hospitals, and the link console |
+| Hospital web app | `FrontendV2/` → generated `frontend/` | Next.js V2 source and the static build served by Hospitals A and B |
+| Link console | `frontend/portal/eve.html` | Eve, noise, tampering, and public-wire simulation controls |
 | Threat classifier (NSL-KDD) + Accept / Monitor / Reject policy + Qiskit BB84 | `threat/`, `fusion/`, `quantum/bb84_qiskit.py`, `scripts/threat_qkd_demo.py` | see [docs/THREAT_QKD.md](docs/THREAT_QKD.md); NSL-KDD is not bundled, and the example figures use synthetic stand-in data |
 | Lab dashboard (original single-process demo) | `backend/`, `frontend/`, `cli.py` | `uvicorn backend.main:app --port 8000` |
 

@@ -39,9 +39,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preload" href="/portal/hospital.js" as="script" />
-      </head>
       <body className="antialiased">
         <ThemeProvider>
           {children}

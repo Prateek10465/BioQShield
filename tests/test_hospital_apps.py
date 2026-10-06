@@ -268,10 +268,10 @@ def test_rotation_on_bob_wipes_the_named_keys(bob):
 def test_pages_and_security_headers(env, which):
     node = Node(which, alice_mod if which == "alice" else bob_mod)
     page = node.http.get("/")
-    assert page.status_code == 200 and "hospital.js" in page.text
+    assert page.status_code == 200 and "BioQShield" in page.text
     assert "default-src 'self'" in page.headers["content-security-policy"]
     assert page.headers["x-content-type-options"] == "nosniff" and page.headers["x-frame-options"] == "DENY"
-    assert node.http.get("/portal/hospital.js").status_code == 200
+    assert node.http.get("/portal/eve.js").status_code == 200
     assert node.http.get("/api/node").json()["role"] == which
     assert node.http.get("/api/keys").headers["cache-control"] == "no-store"
     big = node.http.post("/api/auth/login", content=b"x" * 3_000_000, headers={"content-type": "application/json"})

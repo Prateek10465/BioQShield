@@ -334,7 +334,7 @@ def install(app: FastAPI, ctx: Context, link_probe: Callable[[], dict]):
         if page_name in ("", "index"):
             if (FRONTEND / "index.html").exists():
                 return FileResponse(FRONTEND / "index.html")
-            return FileResponse(PORTAL / "hospital.html")
+            raise HTTPException(503, "FrontendV2 static build is not available. Run scripts/build_frontend.py.")
 
         p_dir = FRONTEND / page_name / "index.html"
         if p_dir.exists():
