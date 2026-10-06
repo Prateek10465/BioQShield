@@ -82,16 +82,14 @@ export function Brand({
       {!compact && (
         <div className="overflow-hidden transition-all duration-300">
           <div
-            className={`text-[15px] font-bold tracking-[0.01em] whitespace-nowrap ${
-              lightText || isDark ? 'text-white' : 'text-[#0B2545]'
-            }`}
+            className={`text-[15px] font-bold tracking-[0.01em] whitespace-nowrap ${lightText || isDark ? 'text-white' : 'text-[#0B2545]'
+              }`}
           >
             BioQShield
           </div>
           <div
-            className={`text-[9px] font-medium uppercase tracking-[0.14em] whitespace-nowrap ${
-              lightText || isDark ? 'text-[#8FA6BF]' : 'text-[#7D8EA5]'
-            }`}
+            className={`text-[9px] font-medium uppercase tracking-[0.14em] whitespace-nowrap ${lightText || isDark ? 'text-[#8FA6BF]' : 'text-[#7D8EA5]'
+              }`}
           >
             Biomedical security
           </div>
@@ -114,9 +112,8 @@ function Sidebar() {
 
   return (
     <aside
-      className={`relative flex flex-col bg-[#0B2545] text-white border-r border-white/5 transition-all duration-300 ease-in-out shrink-0 select-none ${
-        collapsed ? 'w-[76px] px-2.5 py-6 items-center' : 'w-[258px] px-4 py-6'
-      }`}
+      className={`relative flex h-screen flex-col bg-[#0B2545] text-white border-r border-white/5 transition-all duration-300 ease-in-out shrink-0 select-none ${collapsed ? 'w-[76px] px-2.5 py-6 items-center' : 'w-[258px] px-4 py-6'
+        }`}
     >
       <div className={`w-full flex items-center ${collapsed ? 'justify-center' : 'px-3 justify-start'}`}>
         <Brand compact={collapsed} forceTheme={theme} />
@@ -140,18 +137,15 @@ function Sidebar() {
               href={item.href}
               prefetch={true}
               title={collapsed ? item.label : undefined}
-              className={`group relative flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium transition-all duration-200 ${
-                collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
-              } ${
-                active
+              className={`group relative flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium transition-all duration-200 ${collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
+                } ${active
                   ? 'bg-white text-[#0B2545] shadow-[0_6px_16px_rgba(0,0,0,0.15)]'
                   : 'text-[#B9C8D8] hover:bg-white/[0.08] hover:text-white'
-              }`}
+                }`}
             >
               <Icon
-                className={`size-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                  active ? 'text-[#2563EB]' : 'text-[#8FA6BF] group-hover:text-white'
-                }`}
+                className={`size-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-[#2563EB]' : 'text-[#8FA6BF] group-hover:text-white'
+                  }`}
                 strokeWidth={1.8}
               />
               {!collapsed && (
@@ -172,9 +166,8 @@ function Sidebar() {
           href="/about/"
           prefetch={true}
           title={collapsed ? 'About BioQShield' : undefined}
-          className={`group flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white ${
-            collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
-          }`}
+          className={`group flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white ${collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
+            }`}
         >
           <Sparkles className="size-[18px] shrink-0 text-[#8FA6BF] group-hover:text-white" strokeWidth={1.8} />
           {!collapsed && <span className="whitespace-nowrap">About BioQShield</span>}
@@ -183,9 +176,8 @@ function Sidebar() {
           href="/profile/"
           prefetch={true}
           title={collapsed ? 'Profile' : undefined}
-          className={`group flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white ${
-            collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
-          }`}
+          className={`group flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white ${collapsed ? 'justify-center px-0 w-full' : 'px-3.5'
+            }`}
         >
           <UserRound className="size-[18px] shrink-0 text-[#8FA6BF] group-hover:text-white" strokeWidth={1.8} />
           {!collapsed && <span className="whitespace-nowrap">Profile</span>}
@@ -216,9 +208,8 @@ function Sidebar() {
       <button
         onClick={handleLogout}
         title={collapsed ? 'Log out' : undefined}
-        className={`mt-5 flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white w-full ${
-          collapsed ? 'justify-center px-0' : 'px-3.5'
-        }`}
+        className={`mt-5 flex items-center gap-3 rounded-xl py-3 text-[13px] font-medium text-[#B9C8D8] transition-all duration-200 hover:bg-white/[0.08] hover:text-white w-full ${collapsed ? 'justify-center px-0' : 'px-3.5'
+          }`}
       >
         <LogOut className="size-[18px] shrink-0 text-[#8FA6BF]" strokeWidth={1.8} />
         {!collapsed && <span className="whitespace-nowrap">Log out</span>}
@@ -240,7 +231,7 @@ function Topbar() {
   }, [])
 
   return (
-    <header className="flex h-[78px] items-center justify-between border-b border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] px-6 md:px-10 transition-colors duration-200">
+    <header className="sticky top-0 z-10 flex h-[78px] shrink-0 items-center justify-between border-b border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] px-6 md:px-10 transition-colors duration-200">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -251,7 +242,7 @@ function Topbar() {
         >
           <Menu className={`size-[18px] transition-transform duration-300 ${collapsed ? 'rotate-90 text-[#2563EB] dark:text-[#22D3EE]' : ''}`} />
         </button>
-        <div className="text-[12px] text-[#64748B] dark:text-[#9AAABD]">
+        <div className="hidden text-[12px] text-[#64748B] dark:text-[#9AAABD] sm:block">
           Hospital network <span className="mx-2 text-[#B8C5D2] dark:text-white/20">/</span>{' '}
           <span className="font-medium text-[#172033] dark:text-white">Command center</span>
         </div>
@@ -311,13 +302,13 @@ function Topbar() {
             Switch
           </button>
         </div>
-        <div className="h-6 w-px bg-[#D9E2EC] dark:bg-white/10" />
+        <div className="hidden h-6 w-px bg-[#D9E2EC] dark:bg-white/10 sm:block" />
         <div className="relative">
           <button onClick={() => setOpen(!open)} className="flex items-center gap-3 transition hover:opacity-90" aria-expanded={open}>
             <div className="flex size-9 items-center justify-center rounded-full bg-[#DCEBFF] dark:bg-[#2563EB]/20 text-[12px] font-bold text-[#1D56B5] dark:text-[#67E8F9]">
               {user.initials || 'MD'}
             </div>
-            <div className="text-left">
+            <div className="hidden text-left sm:block">
               <div className="text-[12px] font-semibold text-[#172033] dark:text-white">{user.name}</div>
               <div className="text-[10px] text-[#64748B] dark:text-[#9AAABD]">{user.department}</div>
             </div>
@@ -363,11 +354,11 @@ function Topbar() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-[#F7F9FC] dark:bg-[#07111F] text-[#172033] dark:text-white transition-colors duration-200">
+    <div className="flex h-screen overflow-hidden bg-[#F7F9FC] dark:bg-[#07111F] text-[#172033] dark:text-white transition-colors duration-200">
       <Sidebar />
-      <div className="min-w-0 flex-1 flex flex-col transition-all duration-300 ease-in-out">
+      <div className="min-w-0 flex min-h-0 flex-1 flex-col transition-all duration-300 ease-in-out">
         <Topbar />
-        <div className="flex-1 animate-in fade-in-50 duration-150">
+        <div className="min-h-0 flex-1 overflow-y-auto animate-in fade-in-50 duration-150">
           {children}
         </div>
       </div>
@@ -422,11 +413,10 @@ function StatusBadge({ status }: { status: string }) {
   const secure = status === 'Delivered' || status === 'Secure' || status === 'ACCEPT'
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-        secure
-          ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
-          : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
-      }`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${secure
+        ? 'bg-[#E8F7EF] dark:bg-[#22C55E]/15 text-[#198657] dark:text-[#7BE3A0]'
+        : 'bg-[#FDEBEC] dark:bg-[#DC4446]/15 text-[#C33E42] dark:text-[#FF9292]'
+        }`}
     >
       <span className={`size-1.5 rounded-full ${secure ? 'bg-[#22A06B]' : 'bg-[#DC4446]'}`} />
       {status}
@@ -540,8 +530,8 @@ export function Dashboard() {
   ]
 
   return (
-    <main className="mx-auto max-w-[1440px] px-10 py-9">
-      <div className="flex items-start justify-between">
+    <main className="dashboard-grid mx-auto max-w-[1440px] px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#14A493]">
             <span className="size-1.5 rounded-full bg-[#14B8A6]" />
@@ -557,15 +547,15 @@ export function Dashboard() {
         </div>
         <button
           onClick={() => router.push('/secure-transfer/')}
-          className="flex items-center gap-2.5 rounded-xl bg-[#2563EB] px-5 py-3.5 text-[13px] font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.2)] transition hover:bg-[#1D56D0] hover:shadow-[0_10px_22px_rgba(37,99,235,0.26)]"
+          className="group flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#2563EB] px-5 py-3.5 text-[13px] font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.2)] transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-[#1D56D0] hover:shadow-[0_10px_22px_rgba(37,99,235,0.26)] active:translate-y-0 sm:w-auto"
         >
           <Plus className="size-[17px]" strokeWidth={2.5} />
           New Secure Transfer
         </button>
       </div>
 
-      <section className="mt-9">
-        <div className="mb-4 flex items-center justify-between">
+      <section className="mt-8 sm:mt-9">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-[16px] font-bold text-[#172033] dark:text-white">Network security status</h2>
             <p className="mt-1 text-[12px] text-[#7A8B9E]">
@@ -577,9 +567,11 @@ export function Dashboard() {
             Synchronized with QKD engine
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
           {metrics.map((metric) => (
-            <MetricCard key={metric.label} metric={metric} />
+            <div key={metric.label} className="dashboard-reveal">
+              <MetricCard metric={metric} />
+            </div>
           ))}
         </div>
       </section>
@@ -592,13 +584,13 @@ export function Dashboard() {
             Active quantum technologies protecting your hospital network
           </p>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.95fr_0.95fr_1.15fr] lg:gap-4">
           {quantumFeatures.map((feat) => {
             const FIcon = feat.icon
             return (
               <div
                 key={feat.title}
-                className="rounded-2xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] p-5 shadow-[0_3px_12px_rgba(18,52,91,0.035)] transition hover:shadow-md hover:border-[#B0C4DE] dark:hover:border-white/20"
+                className="dashboard-panel rounded-2xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] p-5 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[#B0C4DE] dark:hover:border-white/20"
               >
                 <div className="flex items-start justify-between">
                   <div className={`flex size-10 items-center justify-center rounded-xl ${feat.bgColor}`}>
@@ -620,9 +612,9 @@ export function Dashboard() {
         </div>
       </section>
 
-      <section className="mt-8 grid grid-cols-[1fr_300px] gap-5">
-        <div className="rounded-2xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] shadow-[0_3px_12px_rgba(18,52,91,0.035)]">
-          <div className="flex items-center justify-between border-b border-[#E6EDF3] dark:border-white/10 px-6 py-5">
+      <section className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="dashboard-panel min-w-0 rounded-2xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726]">
+          <div className="flex flex-col gap-3 border-b border-[#E6EDF3] dark:border-white/10 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
               <h2 className="text-[16px] font-bold text-[#172033] dark:text-white">Recent transfers</h2>
               <p className="mt-1 text-[12px] text-[#7A8B9E]">Latest biomedical data movement across hospital network</p>
@@ -634,8 +626,8 @@ export function Dashboard() {
               View all <ArrowRight className="size-3.5" />
             </Link>
           </div>
-          <div className="overflow-hidden">
-            <table className="w-full text-left">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] text-left">
               <thead>
                 <tr className="border-b border-[#E6EDF3] dark:border-white/10 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#91A1B2]">
                   <th className="px-6 py-3.5 font-semibold">Patient</th>
@@ -671,12 +663,23 @@ export function Dashboard() {
                     </td>
                   </tr>
                 ))}
+                {transfers.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-[#EAF8F5] text-[#14A493]">
+                        <Radio className="size-5" />
+                      </div>
+                      <div className="mt-3 text-[12px] font-semibold text-[#172033] dark:text-white">No transfers yet</div>
+                      <div className="mt-1 text-[11px] text-[#8A9AAD]">Start a secure transfer to populate this activity feed.</div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="rounded-2xl bg-[#12345B] p-6 text-white shadow-[0_8px_20px_rgba(18,52,91,0.12)]">
+        <div className="rounded-2xl bg-[#12345B] p-6 text-white shadow-[0_8px_20px_rgba(18,52,91,0.12)] xl:sticky xl:top-6 xl:self-start">
           <div className="flex items-center justify-between">
             <div className="flex size-10 items-center justify-center rounded-xl bg-[#20476F]">
               <Network className="size-[19px] text-[#5EDCEB]" strokeWidth={1.7} />
@@ -703,7 +706,7 @@ export function Dashboard() {
         </div>
       </section>
 
-      <div className="mt-6 flex items-center justify-between rounded-xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] px-5 py-3.5">
+      <div className="mt-6 flex flex-col gap-3 rounded-xl border border-[#D9E2EC] dark:border-white/10 bg-white dark:bg-[#0B1726] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex items-center gap-3">
           <div className="flex size-8 items-center justify-center rounded-lg bg-[#EAF8F5] dark:bg-[#14B8A6]/20 text-[#14A493]">
             <Hospital className="size-4" />
@@ -786,7 +789,7 @@ export function Login() {
           localStorage.setItem('bioqshield_token', authData.token)
         }
       }
-    } catch {}
+    } catch { }
 
     setAuthUser({
       name: matchedUser.name,
@@ -885,11 +888,10 @@ export function Login() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-[15px] font-bold text-[#172033] dark:text-white">{h.name}</span>
-                          <span className={`rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                            isTransmitter
-                              ? 'bg-[#EFF6FF] dark:bg-[#2563EB]/20 text-[#2563EB] dark:text-[#67E8F9]'
-                              : 'bg-[#ECFDF5] dark:bg-[#059669]/20 text-[#059669] dark:text-[#6EE7B7]'
-                          }`}>
+                          <span className={`rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${isTransmitter
+                            ? 'bg-[#EFF6FF] dark:bg-[#2563EB]/20 text-[#2563EB] dark:text-[#67E8F9]'
+                            : 'bg-[#ECFDF5] dark:bg-[#059669]/20 text-[#059669] dark:text-[#6EE7B7]'
+                            }`}>
                             {isTransmitter ? 'Transmitter' : 'Receiver'}
                           </span>
                         </div>
@@ -999,11 +1001,10 @@ export function Login() {
                           key={u.username}
                           type="button"
                           onClick={() => { setUsername(u.username); setPassword(u.password); setError('') }}
-                          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[11px] transition ${
-                            username === u.username
-                              ? 'border-[#2563EB] dark:border-[#22D3EE] bg-[#F4F8FD] dark:bg-white/5 font-semibold text-[#2563EB] dark:text-[#67E8F9]'
-                              : 'border-[#E2EAF2] dark:border-white/10 text-[#64748B] dark:text-[#9AAABD] hover:border-[#9CC7FF]'
-                          }`}
+                          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[11px] transition ${username === u.username
+                            ? 'border-[#2563EB] dark:border-[#22D3EE] bg-[#F4F8FD] dark:bg-white/5 font-semibold text-[#2563EB] dark:text-[#67E8F9]'
+                            : 'border-[#E2EAF2] dark:border-white/10 text-[#64748B] dark:text-[#9AAABD] hover:border-[#9CC7FF]'
+                            }`}
                         >
                           <span className="flex size-6 items-center justify-center rounded-full bg-[#DCEBFF] dark:bg-[#2563EB]/20 text-[9px] font-bold text-[#1D56B5] dark:text-[#67E8F9]">
                             {u.initials}

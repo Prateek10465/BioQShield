@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Aptos', 'Segoe UI', ui-sans-serif, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
@@ -27,17 +27,108 @@
   --ring: #22d3ee;
 }
 
-* { box-sizing: border-box; }
-html { min-width: 1100px; }
-body { margin: 0; background: var(--background); color: var(--foreground); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-button, input { font: inherit; }
-button { cursor: pointer; }
-::selection { background: #cfe1ff; color: #0b2545; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 1100px;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Aptos', 'Segoe UI', ui-sans-serif, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: #cfe1ff;
+  color: #0b2545;
+}
+
+button,
+a,
+input,
+select {
+  outline-offset: 3px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #22d3ee;
+}
+
+.dashboard-grid {
+  background-image: linear-gradient(rgba(37, 99, 235, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 99, 235, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.dashboard-panel {
+  box-shadow: 0 12px 30px rgba(18, 52, 91, 0.045), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-reveal {
+    animation: dashboard-reveal 650ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  .dashboard-reveal:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .dashboard-reveal:nth-child(3) {
+    animation-delay: 140ms;
+  }
+
+  .dashboard-reveal:nth-child(4) {
+    animation-delay: 210ms;
+  }
+}
+
+@keyframes dashboard-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 @media (max-width: 1100px) {
-  html { min-width: 0; }
+  html {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  aside {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
