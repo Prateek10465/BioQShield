@@ -1,0 +1,535 @@
+{
+  "contract_version": "2.0",
+  "project": {
+    "name": "BioQShield",
+    "track": "2.2",
+    "title": "Quantum-Secure Communication for Biomedical Networks",
+    "architecture": "Multi-Node Hospital Network + NSL-KDD Threat Analysis + BB84 QKD + ETSI GS QKD 014 KME + Adaptive Security Policy + AES-256-GCM + HMAC Audit Trail",
+    "frontend": "Next.js 16 (React 19, TypeScript, Tailwind CSS) Static Export served by FastAPI",
+    "backend": "FastAPI Multi-Node (Hospital A :8001, Hospital B :8002, Link Channel :8003, ETSI KME :8004)",
+    "quantum_engine": "Qiskit Aer (BB84 Circuit Simulation, Cascade Error Correction, Privacy Amplification)",
+    "key_management": "ETSI GS QKD 014 Stub KME + Single-Use Key Pool with Automated Expiry and Memory Zeroisation",
+    "audit_engine": "HMAC-SHA256 Chained Hash Tree with Signed Log Heads",
+    "access_control": "Scrypt Hashed Passwords, Bearer Session Tokens, and Strict Role-Based Access Control (RBAC)"
+  },
+  "network_nodes": {
+    "hospital_a": {
+      "name": "Apollo Hospital (Alice)",
+      "port": 8001,
+      "role": "Sender / Primary Command Centre",
+      "services": ["Next.js Frontend V2", "QKD Simulator", "NSL-KDD Classifier", "Workforce Governance", "HMAC Audit"]
+    },
+    "hospital_b": {
+      "name": "Fortis Hospital Network (Bob)",
+      "port": 8002,
+      "role": "Receiver / Authorised Destination Node",
+      "services": ["Authenticated Decryption", "Peer QKD Store", "Inbox Verification"]
+    },
+    "quantum_channel": {
+      "name": "Optical Quantum Link & Public Wire (Eve)",
+      "port": 8003,
+      "role": "Simulated Optical Fibre Channel",
+      "services": ["Eve Intercept-Resend Probing", "Photon Noise Injection", "Tampering Detection", "Demo Transfer Feed"]
+    },
+    "kme_service": {
+      "name": "ETSI GS QKD 014 Key Management Entity",
+      "port": 8004,
+      "role": "Standards-Compliant Central Key Manager",
+      "services": ["ETSI 014 REST Key Store", "Key Material Delivery", "Key Zeroisation"]
+    }
+  },
+  "roles_and_access_control": {
+    "admin": {
+      "title": "Hospital System Administrator",
+      "demo_credentials": "admin / admin-demo-pass",
+      "permissions": [
+        "Full access to Network Admin Console (/admin/)",
+        "Add, modify, and delete hospital doctors, workers, and auditors",
+        "Trigger Emergency Quantum Key Zeroisation and Rotation",
+        "Inspect and verify HMAC-SHA256 audit log integrity",
+        "Configure hospital network nodes and review link telemetry"
+      ],
+      "restrictions": [
+        "Separation of Duties: Cannot view raw unencrypted patient clinical payload records"
+      ]
+    },
+    "clinician": {
+      "title": "Senior Consultant / Doctor",
+      "demo_credentials": "dr.rao / clinician-demo-pass",
+      "permissions": [
+        "Access Hospital Command Centre Dashboard (/dashboard/)",
+        "Initiate and execute quantum-secure transfers (/secure-transfer/)",
+        "Review real-time quantum and classical security telemetry (/security-analysis/)",
+        "Inspect personal transfer history and decrypted patient outcomes"
+      ],
+      "restrictions": [
+        "Strictly prohibited from Network Admin Console (/admin/ is hidden and blocked)",
+        "Cannot add/remove workforce staff",
+        "Cannot trigger key rotation or modify system configurations"
+      ]
+    },
+    "worker": {
+      "title": "Healthcare Staff / Nurse / Lab Technician",
+      "demo_credentials": "nurse.priya / bioqshield2026",
+      "permissions": [
+        "View hospital department transfers and resource movement queues",
+        "Access clinical workspace and technical metrics"
+      ],
+      "restrictions": [
+        "Strictly prohibited from Network Admin Console (/admin/)",
+        "Cannot manage staff or rotate keys"
+      ]
+    },
+    "auditor": {
+      "title": "Compliance & Cryptographic Auditor",
+      "demo_credentials": "auditor / auditor-demo-pass",
+      "permissions": [
+        "Inspect and verify HMAC-SHA256 audit log hash chain (/api/audit/verify)",
+        "Review quantum key pool sizes, expiry TTLs, and usage metrics (/api/keys)",
+        "Inspect active sessions and security policy compliance"
+      ],
+      "restrictions": [
+        "Zero access to patient clinical health records (PHI/PII)"
+      ]
+    }
+  },
+  "system_flow": [
+    "User authenticates with Scrypt credentials and receives a scoped bearer token",
+    "Clinician selects synthetic patient records, destination network, and channel parameters",
+    "NSL-KDD machine learning classifier analyzes classical network traffic telemetry",
+    "BB84 QKD protocol simulates quantum key distribution over Qiskit Aer",
+    "Channel noise and optional Eve eavesdropping induce quantum state collapse and bit errors",
+    "Cascade error correction fixes bit flips; privacy amplification compresses the secret key",
+    "QBER (Quantum Bit Error Rate) is estimated and compared against the 11% abort threshold",
+    "Threat-aware adaptive policy calculates dynamic QBER acceptance boundaries",
+    "Decision engine evaluates ACCEPT, MONITOR, or REJECT verdict",
+    "Zero-Leakage Enforcement: If REJECT/MONITOR, quantum keys are blocked and zero data is sent",
+    "If ACCEPT: SHA-256 derives a 256-bit AES key, and AES-256-GCM encrypts the biomedical record",
+    "Authorized destination node verifies decryption match and records receipt",
+    "Transfer event is assigned dynamic real datetime timestamp and committed to local history",
+    "Tamper-evident HMAC-SHA256 hash chain logs the operation with signed log heads",
+    "System Administrator governs network nodes, monitors live key pools, and manages workforce"
+  ],
+  "frontend": {
+    "engine": "Next.js 16 (App Router) + React 19 + Tailwind CSS + Lucide Icons",
+    "deployment": "Exported to static HTML/CSS/JS and served directly by FastAPI",
+    "pages": {
+      "/": "Landing & Command Centre Overview with live quantum metrics and system admin beacons",
+      "/dashboard/": "Hospital Command Centre: Network status, key readiness, recent transfers, quick transfer actions",
+      "/secure-transfer/": "5-step biomedical data transfer wizard: patient, records, destination, quantum parameters, review",
+      "/security-analysis/": "Live quantum security pipeline execution: NSL-KDD threat scoring, BB84 channel, QBER gauge, policy comparison, AES-256-GCM encryption/decryption",
+      "/security-dashboard/": "Technical SOC view: Real-time QBER threshold curves, NSL-KDD telemetry, recent security events",
+      "/admin/": "Hospital Network Command & Workforce Administration (Admin-Only): Manage doctors/workers, emergency key rotation, audit verification, node overview",
+      "/transfer-history/": "Audit trail of biomedical transfers with dynamic dates, verdicts, status, search, and filtering",
+      "/transfer-history/[id]/": "Cryptographic inspection of individual transfers with SHA-256 match and nonce data",
+      "/scenario-comparison/": "Benchmark matrix comparing 7 clinical scenarios under static vs adaptive policies",
+      "/login/": "Hospital-selectable login portal (Apollo vs Fortis) with demo accounts",
+      "/profile/": "Clinician / Administrator profile, hospital node bindings, and admin shortcuts",
+      "/quantum-console/": "Interactive Qiskit Aer BB84 circuit visualizer with per-qubit ASCII circuits",
+      "/about/": "Detailed mathematical and cryptographic documentation of BioQShield"
+    },
+    "timestamp_handling": {
+      "format": "Real-time enterprise audit formatting (Today · hh:mm A, Yesterday · hh:mm A, DD MMM YYYY · hh:mm A)",
+      "storage": "ISO 8601 createdAt timestamp string",
+      "healing": "Automatic runtime migration of legacy 'Just now' placeholder records in localStorage"
+    },
+    "controls": {
+      "n_qubits": {
+        "type": "integer",
+        "allowed": [2048, 4096, 8192, 16384, 32768],
+        "default": 8192
+      },
+      "noise": {
+        "type": "float",
+        "unit": "fraction",
+        "range": [0.0, 0.2],
+        "ui_unit": "percent",
+        "default": 0.02
+      },
+      "eve": {
+        "type": "boolean",
+        "default": false
+      },
+      "eve_rate": {
+        "type": "float",
+        "range": [0.0, 1.0],
+        "ui_unit": "percent",
+        "default": 1.0
+      },
+      "eve_start": {
+        "type": "float",
+        "range": [0.0, 0.95],
+        "default": 0.0,
+        "description": "Fraction of qubit stream at which Eve begins intercepting"
+      },
+      "traffic": {
+        "type": "enum",
+        "values": ["benign", "mixed", "attack", null],
+        "default": "benign"
+      },
+      "adaptive": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable threat-aware adaptive QBER thresholds"
+      },
+      "seed": {
+        "type": "integer",
+        "nullable": true,
+        "description": "Ensures reproducible simulation runs"
+      }
+    },
+    "presets": {
+      "clean": {
+        "n_qubits": 8192,
+        "noise": 0.02,
+        "eve": false,
+        "traffic": "benign",
+        "adaptive": true
+      },
+      "noisy": {
+        "n_qubits": 8192,
+        "noise": 0.05,
+        "eve": false,
+        "traffic": "benign",
+        "adaptive": true
+      },
+      "eve": {
+        "n_qubits": 8192,
+        "noise": 0.02,
+        "eve": true,
+        "eve_rate": 1.0,
+        "traffic": "benign",
+        "adaptive": true
+      },
+      "hostile": {
+        "n_qubits": 8192,
+        "noise": 0.05,
+        "eve": false,
+        "traffic": "attack",
+        "adaptive": true
+      }
+    }
+  },
+  "api": {
+    "public_endpoints": {
+      "health": {
+        "method": "GET",
+        "path": "/api/health",
+        "description": "Node health and operational role (alice, bob, link, etsi-stub)",
+        "response": { "ok": "boolean", "role": "string" }
+      },
+      "node": {
+        "method": "GET",
+        "path": "/api/node",
+        "description": "Hospital node identity, peer binding, key source, and key TTL",
+        "response": { "role": "string", "name": "string", "peer_name": "string", "key_source": "string", "key_ttl": "integer" }
+      },
+      "link_state": {
+        "method": "GET",
+        "path": "/api/link-state",
+        "description": "Live quantum link conditions from channel service",
+        "response": { "reachable": "boolean", "source": "string", "eve": "boolean", "noise": "float", "tamper": "boolean" }
+      }
+    },
+    "auth_endpoints": {
+      "login": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "request": { "username": "string", "password": "string" },
+        "response": { "token": "string", "expires": "float", "user": { "username": "string", "role": "string" } }
+      },
+      "logout": {
+        "method": "POST",
+        "path": "/api/auth/logout",
+        "headers": { "Authorization": "Bearer <token>" },
+        "response": { "ok": "boolean" }
+      }
+    },
+    "simulation_and_threat_endpoints": {
+      "run": {
+        "method": "POST",
+        "path": "/api/run",
+        "request": {
+          "n_qubits": "integer",
+          "noise": "float [0,0.2]",
+          "eve": "boolean",
+          "eve_rate": "float [0,1]",
+          "eve_start": "float [0,0.95]",
+          "seed": "integer|null",
+          "traffic": "benign|mixed|attack|null",
+          "adaptive": "boolean"
+        },
+        "response": {
+          "params": {
+            "n_qubits": "integer",
+            "noise": "float",
+            "eve": "boolean",
+            "eve_rate": "float",
+            "eve_start": "float"
+          },
+          "status": "secure|aborted",
+          "reason": "string|null",
+          "stats": {
+            "n_sent": "integer",
+            "n_sifted": "integer",
+            "sample_size": "integer",
+            "qber_est": "float",
+            "qber_upper": "float",
+            "threshold": "float",
+            "sim_true_qber": "float",
+            "sim_eve_known_fraction": "float",
+            "ec_errors_fixed": "integer",
+            "ec_leaked_bits": "integer",
+            "ec_verified": "boolean",
+            "ec_rounds": "integer",
+            "pa_input_bits": "integer",
+            "final_key_bits": "integer",
+            "key_available": "boolean"
+          },
+          "threat": {
+            "score": "float [0,1]",
+            "classification": "normal|attack",
+            "attack_family": "string|null",
+            "classifier": { "source": "string", "accuracy": "float", "f1": "float", "n_train": "integer" }
+          },
+          "decision": {
+            "verdict": "ACCEPT|MONITOR|REJECT",
+            "reason": "string",
+            "accept_below": "float",
+            "reject_at": "float"
+          },
+          "record": {
+            "status": "delivered|blocked",
+            "plaintext": "string",
+            "ciphertext_hex": "string|null",
+            "nonce_hex": "string|null",
+            "decrypted": "string|null"
+          },
+          "elapsed_ms": "integer"
+        }
+      },
+      "scenarios": {
+        "method": "GET",
+        "path": "/api/scenarios",
+        "description": "Benchmark the 7 clinical traffic and channel combinations"
+      },
+      "qiskit_demo": {
+        "method": "POST",
+        "path": "/api/qiskit-demo",
+        "request": { "n": "integer [4,24]", "eve": "boolean", "noise": "float [0,0.2]", "seed": "integer|null" },
+        "response": { "circuit_ascii": "string", "rows": "array", "kept": "integer", "qber": "float" }
+      },
+      "demo_transfer": {
+        "method": "POST",
+        "path": "/api/demo-transfer",
+        "description": "Forward synthetic transfer metadata with timestamp to link console"
+      }
+    },
+    "admin_and_governance_endpoints": {
+      "network_overview": {
+        "method": "GET",
+        "path": "/api/admin/network/overview",
+        "headers": { "Authorization": "Bearer <admin-token>" },
+        "response": {
+          "node": { "name": "string", "role": "string", "key_source": "string" },
+          "users": "array of hospital staff",
+          "pool": { "available": "integer", "reserved": "integer", "used": "integer", "expired": "integer", "key_bits": "integer" },
+          "audit_verification": { "ok": "boolean", "checked": "integer" },
+          "link": "object"
+        }
+      },
+      "rotate_keys": {
+        "method": "POST",
+        "path": "/api/admin/network/rotate-keys",
+        "headers": { "Authorization": "Bearer <admin-token>" },
+        "response": { "ok": "boolean", "expired_count": "integer", "message": "string" }
+      },
+      "manage_users": {
+        "list": { "method": "GET", "path": "/api/users", "headers": { "Authorization": "Bearer <admin-token>" } },
+        "create": { "method": "POST", "path": "/api/users", "request": { "username": "string", "password": "string", "role": "admin|clinician|auditor|worker" } },
+        "delete": { "method": "DELETE", "path": "/api/users/{username}", "headers": { "Authorization": "Bearer <admin-token>" } }
+      },
+      "audit_verify": {
+        "method": "GET",
+        "path": "/api/audit/verify",
+        "headers": { "Authorization": "Bearer <auditor-or-admin-token>" },
+        "description": "Cryptographically recomputes HMAC-SHA256 chain and validates against signed head",
+        "response": { "ok": "boolean", "checked": "integer", "bad_id": "integer|null", "problem": "string|null" }
+      },
+      "audit_entries": {
+        "method": "GET",
+        "path": "/api/audit",
+        "headers": { "Authorization": "Bearer <auditor-or-admin-token>" },
+        "response": { "entries": "array of audit log events", "next_before": "integer|null" }
+      },
+      "key_pool_stats": {
+        "method": "GET",
+        "path": "/api/keys",
+        "headers": { "Authorization": "Bearer <token>" },
+        "response": { "pool": "object", "source": "string", "ttl": "integer" }
+      }
+    }
+  },
+  "threat_layer": {
+    "dataset": "NSL-KDD",
+    "classification": {
+      "normal": "benign network traffic telemetry",
+      "attack": "malicious network traffic pattern"
+    },
+    "output": {
+      "score": "0.0 to 1.0",
+      "meaning": "Estimated classical network threat level"
+    },
+    "frontend_display": {
+      "metric": "Network threat score",
+      "visual": "Dynamic progress gauge with threshold flags",
+      "classification": "NORMAL (< 0.5) or ATTACK (>= 0.5)"
+    }
+  },
+  "quantum_layer": {
+    "protocol": "BB84",
+    "implementation": "Qiskit Aer quantum circuit backend + Python statevector simulation",
+    "transmission": {
+      "alice": "Random bit generation + random basis preparation (|0>, |1>, |+>, |->)",
+      "bob": "Random rectilinear/diagonal measurement bases",
+      "eve": "Intercept-resend probing (induces observable quantum state perturbation)",
+      "noise": "Optical fiber depolarizing and bit-flip channel noise"
+    },
+    "processing": [
+      "Basis sifting over classical channel",
+      "revealed sample QBER estimation",
+      "Cascade error correction with parity checks",
+      "Key verification via SHA-256 confirmation",
+      "Toeplitz hash privacy amplification"
+    ],
+    "security": {
+      "qber_abort_threshold": 0.11,
+      "description": "QBER >= 11% aborts quantum key release due to potential eavesdropping"
+    },
+    "output": {
+      "qber_est": "float",
+      "qber_upper": "float",
+      "final_key_bits": "integer",
+      "key_available": "boolean",
+      "sim_eve_known_fraction": "float"
+    }
+  },
+  "decision_layer": {
+    "static_policy": {
+      "accept": "QBER < 6%",
+      "monitor": "6% <= QBER < 11%",
+      "reject": "QBER >= 11% or failed channel security"
+    },
+    "adaptive_policy": {
+      "accept_threshold": {
+        "formula": "0.06 - 0.03 * threat_score",
+        "unit": "fraction"
+      },
+      "reject_threshold": {
+        "formula": "0.11 - 0.04 * threat_score",
+        "unit": "fraction"
+      },
+      "high_threat_escalation": {
+        "condition": "threat_score >= 0.8",
+        "action": "Escalate MONITOR to REJECT immediately"
+      }
+    },
+    "outputs": ["ACCEPT", "MONITOR", "REJECT"],
+    "key_release": {
+      "ACCEPT": "Release derived 256-bit AES key for record encryption and delivery",
+      "MONITOR": "Hold transfer in quarantine; zeroise keys and request channel re-negotiation",
+      "REJECT": "Zero-Leakage Enforcement: Instantly zeroise key material; abort data transmission completely"
+    }
+  },
+  "record_security": {
+    "data_type": "Synthetic patient biomedical records (EHR, vitals, prescriptions, scans)",
+    "encryption": {
+      "algorithm": "AES-256-GCM (Authenticated Encryption with Associated Data)",
+      "key_source": "Privacy-amplified quantum key material",
+      "nonce": "Cryptographically secure unique 96-bit nonce per transmission"
+    },
+    "secure_flow": [
+      "BB84 QKD generates synchronized raw keys",
+      "Error correction and privacy amplification produce distilled secret key",
+      "SHA-256 derives 256-bit AES key material",
+      "AES-256-GCM encrypts synthetic patient record",
+      "Ciphertext and authentication tag are sent to authorized destination node",
+      "Destination hospital node decrypts using identical shared quantum key and verifies tag"
+    ],
+    "blocked_flow": [
+      "Quantum channel anomaly or classical threat detected",
+      "Policy evaluates to REJECT or MONITOR",
+      "Quantum keys are zeroised immediately",
+      "AES-256 encryption is aborted",
+      "Zero patient bytes leave source hospital memory"
+    ]
+  },
+  "audit_and_compliance": {
+    "standard": "ETSI GS QKD 014 & HIPAA Tamper-Evident Logging",
+    "mechanism": "HMAC-SHA256 Hash Chain",
+    "properties": [
+      "Each log entry includes HMAC of previous record (cryptographic tamper-evident chain)",
+      "Signed head prevents truncation, reordering, and unauthorized insertions",
+      "Mathematical integrity check verifiable on-demand via /api/audit/verify",
+      "Logs every login, transfer, key zeroisation, and user management action"
+    ]
+  },
+  "demo_scenarios": {
+    "clean_link": {
+      "description": "Baseline clinical operations: low noise, no Eve, benign network traffic",
+      "traffic": "benign",
+      "noise": 0.02,
+      "eve": false,
+      "adaptive": true,
+      "expected_verdict": "ACCEPT",
+      "expected_delivery": "Delivered"
+    },
+    "noisy_link": {
+      "description": "Optical fiber degradation: higher noise, no active adversary",
+      "traffic": "benign",
+      "noise": 0.05,
+      "eve": false,
+      "adaptive": true,
+      "expected_verdict": "ACCEPT",
+      "expected_delivery": "Delivered"
+    },
+    "hostile_network": {
+      "description": "Classical network attack: high threat score triggers adaptive policy tightening",
+      "traffic": "attack",
+      "noise": 0.05,
+      "eve": false,
+      "adaptive": true,
+      "expected_verdict": "REJECT",
+      "expected_delivery": "Blocked"
+    },
+    "eve_listening": {
+      "description": "Active quantum eavesdropping: Eve intercept-resend forces QBER > 11%",
+      "traffic": "benign",
+      "noise": 0.02,
+      "eve": true,
+      "eve_rate": 1.0,
+      "adaptive": true,
+      "expected_verdict": "REJECT",
+      "expected_delivery": "Blocked"
+    }
+  },
+  "branding": {
+    "name": "BioQShield",
+    "tagline": "Quantum-Secure Communication for Biomedical Networks",
+    "emblem": "Quantum Health Shield Emblem (Light & Dark dynamic SVG/PNG)",
+    "themes": {
+      "light": { "background": "#F7F9FC", "surface": "#FFFFFF", "text": "#172033" },
+      "dark": { "background": "#07111F", "surface": "#0B1726", "text": "#FFFFFF" }
+    },
+    "palette": {
+      "deep_navy": "#0B2545",
+      "healthcare_blue": "#2563EB",
+      "quantum_cyan": "#06B6D4",
+      "medical_teal": "#14B8A6",
+      "admin_purple": "#8B5CF6",
+      "verdict_accept": "#22A06B",
+      "verdict_monitor": "#D97706",
+      "verdict_reject": "#DC4446"
+    }
+  }
+}
