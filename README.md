@@ -144,28 +144,6 @@ Share the generated `https://<random-id>.trycloudflare.com` URL with judges.
 
 ---
 
-## 🏆 Recommended 3-Minute Live Judge Demo
-
-Set up two browser windows side by side:
-- **Left Window:** Hospital Command Centre (`http://localhost:8001`)
-- **Right Window:** Eve Link Console (`http://localhost:8003`)
-
-1. **Clean Quantum Transfer**:
-   - Log in as `dr.rao`. Navigate to **Secure Transfer**.
-   - Select patient record and Fortis Hospital. Execute transfer.
-   - Watch the live pipeline: QBER measures ~2.0%, decision evaluates to **ACCEPT**, a 256-bit AES key is derived, and destination decryption is verified.
-2. **Active Eavesdropping Defense**:
-   - In the Link Console window, toggle **Eve listening** to `ON` (intercepting photon stream).
-   - In the Hospital window, execute another transfer.
-   - Watch the quantum state collapse: QBER spikes to ~25%, exceeding the 11% threshold.
-   - Adaptive policy evaluates to **REJECT**: Zero key release, AES encryption aborted, and **Zero-Leakage Enforcement** safely halts data transmission.
-3. **Administrative Governance**:
-   - Log in as `admin`. Open the exclusive **Network Admin** console.
-   - Demonstrate workforce administration (adding/removing doctors and workers).
-   - Click **Emergency Key Rotation**: watch active quantum key pools zeroise across both hospital nodes simultaneously.
-   - Click **Verify Audit Integrity**: execute live HMAC-SHA256 mathematical hash verification.
-
----
 
 ## 🛠️ Testing & Verification
 
@@ -221,3 +199,14 @@ BioQShield/
 ## 📄 License & Intellectual Property
 
 Developed for the **Qiskit Fall Fest Hackathon 2026** under the Apache 2.0 / MIT License. All patient data, clinical entries, and telemetry streams are synthetic models intended strictly for cryptographic demonstration and educational research.
+
+---
+
+## 👥 Team & Roles
+
+1. **Prateek** — Team Leader, Backend & Frontend Integration
+2. **Swastik** — Frontend & UI/UX
+3. **Himanshu** — Backend 
+4. **Sameer** — Backend + Research
+5. **Durga** — Cybersecurity
+
