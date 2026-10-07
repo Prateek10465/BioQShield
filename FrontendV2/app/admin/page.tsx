@@ -85,14 +85,27 @@ export default function AdminPage() {
   const [isVerifyingAudit, setIsVerifyingAudit] = useState(false)
   const [auditLogs, setAuditLogs] = useState<any[]>([])
   const [networkOverview, setNetworkOverview] = useState<any>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
-  // Load initial data
+  // Load initial data & enforce Administrator Clearance
   useEffect(() => {
     const auth = getAuthUser()
     setCurrentUser(auth)
+    if (!auth || !auth.isLoggedIn) {
+      window.location.href = '/login/'
+      return
+    }
+    if (!isSystemAdmin(auth)) {
+      setCheckingAuth(false)
+      const timer = setTimeout(() => {
+        router.push('/dashboard/')
+      }, 2500)
+      return () => clearTimeout(timer)
+    }
+    setCheckingAuth(false)
     refreshStaff()
     loadNetworkData()
-  }, [])
+  }, [router])
 
   const refreshStaff = () => {
     const users = getHospitalUsers()
@@ -265,6 +278,48 @@ export default function AdminPage() {
       setNewStaffRole('Compliance & Cryptographic Auditor')
       setNewStaffDepartment('Security Compliance')
     }
+  }
+
+  if (checkingAuth) {
+    return (
+      <AppShell>
+        <main className="mx-auto max-w-[1240px] px-6 py-24 text-center">
+          <div className="mx-auto size-9 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent" />
+          <p className="mt-4 text-xs font-semibold text-[#64748B] dark:text-[#9AAABD]">
+            Verifying hospital network administrative credentials...
+          </p>
+        </main>
+      </AppShell>
+    )
+  }
+
+  if (!currentUser || !isSystemAdmin(currentUser)) {
+    return (
+      <AppShell>
+        <main className="mx-auto max-w-[680px] px-6 py-20 text-center">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
+            <ShieldAlert className="size-8" />
+          </div>
+          <div className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-[11px] font-bold text-red-500">
+            Access Prohibited · Administrator Clearance Required
+          </div>
+          <h1 className="mt-3 text-[26px] font-extrabold text-[#0B2545] dark:text-white">
+            Network Admin Console Is Restricted
+          </h1>
+          <p className="mt-2 text-[14px] text-[#58718D] dark:text-[#9AAABD] leading-relaxed">
+            This module contains root cryptographic key controls, node configuration, and workforce governance. It is accessible exclusively by System Administrators. Doctors and staff members do not have permission to view or manage hospital network administration.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <button
+              onClick={() => router.push('/dashboard/')}
+              className="rounded-xl bg-[#2563EB] hover:bg-[#1D56D0] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
+            >
+              Return to Dashboard
+            </button>
+          </div>
+        </main>
+      </AppShell>
+    )
   }
 
   return (

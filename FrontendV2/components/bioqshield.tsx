@@ -67,7 +67,7 @@ const navItems = [
   { label: 'Dashboard', href: '/dashboard/', icon: LayoutDashboard },
   { label: 'Secure Transfer', href: '/secure-transfer/', icon: Send },
   { label: 'Security Dashboard', href: '/security-dashboard/', icon: ShieldCheck },
-  { label: 'Network Admin', href: '/admin/', icon: ShieldAlert, badge: 'Admin' },
+  { label: 'Network Admin', href: '/admin/', icon: ShieldAlert, badge: 'Admin', adminOnly: true },
   { label: 'Scenario Comparison', href: '/scenario-comparison/', icon: BarChart3 },
   { label: 'Transfer History', href: '/transfer-history/', icon: FileText },
 ]
@@ -122,11 +122,23 @@ function Sidebar() {
   const router = useRouter()
   const { theme } = useTheme()
   const { collapsed } = useSidebar()
+  const [user, setUser] = useState<AuthUser | null>(null)
+
+  useEffect(() => {
+    setUser(getAuthUser())
+  }, [pathname])
 
   const handleLogout = () => {
     logoutUser()
     window.location.href = '/login/'
   }
+
+  const visibleNavItems = navItems.filter((item) => {
+    if ((item as any).adminOnly) {
+      return isSystemAdmin(user)
+    }
+    return true
+  })
 
   return (
     <aside
@@ -146,7 +158,7 @@ function Sidebar() {
       )}
 
       <nav className="mt-3 flex flex-col gap-1 w-full" aria-label="Primary navigation">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
           const Icon = item.icon
           return (
